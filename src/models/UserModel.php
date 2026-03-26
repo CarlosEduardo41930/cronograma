@@ -29,4 +29,9 @@ function getLogin($pdo, $nome, $senha){
     }
 }
 
-function getAulaAluno($pdo, )
+function getAulaAluno($pdo, $id,){
+    $sql = "SELECT * FROM aulas WHERE fk_turma_id = ? AND status LIKE 'ativa' ORDER BY ordem DESC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetchAll();
+}
