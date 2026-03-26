@@ -28,3 +28,5 @@ function getLogin($pdo, $nome, $senha){
     $_SESSION['erro'][] = "Usuário ou senha incorretos!";
     }
 }
+
+function getAulaAluno($pdo, )
