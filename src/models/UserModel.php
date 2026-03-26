@@ -1,6 +1,6 @@
 <?php
 
-function login($pdo, $nome, $senha){
+function getLogin($pdo, $nome, $senha){
     $sql = "SELECT * FROM usuario WHERE nome = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$nome]);
@@ -13,7 +13,7 @@ function login($pdo, $nome, $senha){
     
         if ($usuario['nivel'] == 'professor') {
     
-            header("Location: ../public/professor.php");
+            header("Location: ../public/turmas.php");
             exit();
     
         } elseif ($usuario['nivel'] == 'aluno') {

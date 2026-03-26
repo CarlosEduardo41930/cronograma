@@ -1,44 +1,8 @@
 <?php
 session_start();
+require_once '../src/controllers/UserControll.php';
+login();
 
-$error = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    // Conexão com banco
-    $conn = new mysqli("localhost", "root", "", "seubanco");
-
-    if ($conn->connect_error) {
-        die("Erro na conexão: " . $conn->connect_error);
-    }
-
-    // Buscar usuário
-    $stmt = $conn->prepare("SELECT id, username, password FROM usuarios WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-
-            header("Location: dashboard.php");
-            exit;
-        } else {
-            $error = "Senha incorreta.";
-        }
-    } else {
-        $error = "Usuário não encontrado.";
-    }
-
-    $stmt->close();
-    $conn->close();
-}
 ?>
 
 <!DOCTYPE html>
