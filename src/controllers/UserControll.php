@@ -61,8 +61,27 @@ function login()
 
         if (empty($_SESSION['erro'])) {
             getLogin($pdo, $nome, $senha);
+            getTipo($pdo);
         }
     }
+}
+
+
+function mensagemErro (){
+    if (!empty($_SESSION['erro'])) {
+        echo "<div class='text-sm rounded-xl px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400'>";
+        echo "<ul>";
+
+        foreach ($_SESSION['erro'] as $erro) {
+            echo "<li>". htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') . "</li>";
+        }
+
+        echo "</ul>";
+        echo "</div>";
+        unset($_SESSION['erro']);
+
+    }
+
 }
 
 function aulaAluno()

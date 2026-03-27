@@ -29,7 +29,7 @@ verificarTipo(['professor']);
 
 <!-- Botão para criar nova aula -->
 <div class="mb-6">
-  <a href="cadastrar_aula.php" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-xl font-semibold text-white">
+  <a href="cadastrar_aula.php?<?=  trim($_GET['turma']) ?> ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-xl font-semibold text-white">
     Criar Nova Aula
   </a>
 </div>
@@ -39,7 +39,7 @@ verificarTipo(['professor']);
   <?php aulaProfessor(); ?>
 
 </div>
-oi
+
 <footer class="bg-blue-900 text-gray-200 mt-auto py-6">
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
 

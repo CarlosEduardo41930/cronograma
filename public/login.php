@@ -130,7 +130,7 @@ verificarLogadoTipo();
       style="box-shadow: 0 8px 40px rgba(0,0,0,0.5);">
 
       <!-- Formulário -->
-      <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="space-y-4">
+      <form method="POST" class="space-y-4">
 
         <!-- E-mail -->
         <div class="fade-up delay-3">
@@ -187,11 +187,7 @@ verificarLogadoTipo();
       </form>
 
       <!-- Erro PHP -->
-      <?php if (!empty($error)): ?>
-        <div class="text-sm rounded-xl px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400">
-          <?php echo htmlspecialchars($error); ?>
-        </div>
-      <?php endif; ?>
+      <?php mensagemErro (); ?>
 
     </div>
 

@@ -10,21 +10,42 @@ function getLogin($pdo, $nome, $senha)
     if ($usuario && password_verify($senha, $usuario['senha'])) {
 
         $_SESSION['nivel'] = $usuario['nivel'];
+        $_SESSION['id_usuario'] = $usuario['id'];
 
 
         if ($usuario['nivel'] == 'professor') {
-            $_SESSION['id_usuario'] = $usuario['id'];
+
             header("Location: ../public/turmas.php");
             exit();
         } elseif ($usuario['nivel'] == 'aluno') {
-            $idAluno = ($usuario['id'] - 1);
-            $_SESSION['id_usuario'] = $idAluno;
             header("Location: ../public/aluno.php");
             exit();
         }
     } else {
 
         $_SESSION['erro'][] = "Usuário ou senha incorretos!";
+    }
+}
+
+function getTipo($pdo)
+{
+    $nivel = $_SESSION['nivel'];
+    $id = $_SESSION['id_usuario'];
+
+    if ($nivel == 'professor') {
+        $sql = "SELECT id FROM professor WHERE  fk_usuario_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id]);
+        $usuario = $stmt->fetch();
+
+        $_SESSION['id_nivel'] = $usuario['id']; 
+    }else{
+        $sql = "SELECT id FROM turma WHERE  fk_usuario_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id]);
+        $usuario = $stmt->fetch();
+
+        $_SESSION['id_nivel'] = $usuario['id']; 
     }
 }
 
@@ -36,14 +57,16 @@ function getAulaAluno($pdo, $id,)
     return $stmt->fetchAll();
 }
 
-function getTurma($pdo, $id){
+function getTurma($pdo, $id)
+{
     $sql = "SELECT id, turma, descricao FROM turma WHERE fk_professor = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
     return $stmt->fetchAll();
 }
 
-function getAulaProfessor($pdo, $id){
+function getAulaProfessor($pdo, $id)
+{
     $sql = "SELECT * FROM aulas WHERE fk_professor_id = ?  ORDER BY CAST(ordem AS UNSIGNED)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
