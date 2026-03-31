@@ -4,43 +4,47 @@ verificarTipo(['professor']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8"/>
-<title>EduPortal — Aulas da Turma</title>
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <title>EduPortal — Aulas da Turma</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-[#0B0F1A] text-[#E8EFF7] min-h-screen p-6 flex flex-col">
 
-<div class="flex items-center gap-4 mb-6">
-  <!-- Botão Voltar -->
-  <button onclick="history.back()"
-          class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold transition-colors duration-200">
-    ← Voltar
-  </button>
+  <div class="flex items-center gap-4 mb-6">
 
-  <!-- Botão Sair -->
-  <a href="../src/controllers/logout.php"
-     class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm font-semibold text-white transition-colors duration-200">
-    Sair
-  </a>
-</div>
+    <!-- Botão Voltar -->
+    <button onclick="history.back()"
+      class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold transition-colors duration-200">
+      ← Voltar
+    </button>
 
-<h1 class="text-3xl font-bold mb-6">Turma A – Matemática</h1>
+    <!-- Botão Sair -->
+    <a href="../src/controllers/logout.php"
+      class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm font-semibold text-white transition-colors duration-200">
+      Sair
+    </a>
+  </div>
+  
 
-<!-- Botão para criar nova aula -->
-<div class="mb-6">
-  <a href="cadastrar_aula.php?<?=  trim($_GET['turma']) ?> ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-xl font-semibold text-white">
-    Criar Nova Aula
-  </a>
-</div>
+  <h1 class="text-3xl font-bold mb-6">Turma A – Matemática</h1>
 
-<div class="space-y-4 mb-4">
+  <!-- Botão para criar nova aula -->
+  <div class="mb-6">
+    <a href="cadastrar_aula.php?turma=<?= trim($_GET['turma']) ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-xl font-semibold text-white">
+      Criar Nova Aula
+    </a>
+  </div>
 
-  <?php aulaProfessor(); ?>
+  <div class="space-y-4 mb-4">
 
-</div>
+    <?php aulaProfessor(); ?>
 
-<footer class="bg-blue-900 text-gray-200 mt-auto py-6">
+  </div>
+
+  <footer class="bg-blue-900 text-gray-200 mt-auto py-6">
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
 
       <!-- Identidade -->
@@ -73,4 +77,5 @@ verificarTipo(['professor']);
   </footer>
 
 </body>
+
 </html>
