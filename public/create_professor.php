@@ -1,8 +1,8 @@
 <?php
 session_start();
-require 'conexao.php'; // arquivo que cria $pdo
 
-// Função para criar professor
+
+//Função para criar professor
 function setCriarProfessor($pdo, $nome, $senha, $tipo, $descricao, $nivel = 'professor') {
     if (!$nome || !$senha || !$tipo) {
         $_SESSION['erro'][] = "Todos os campos obrigatórios devem ser preenchidos.";
@@ -55,21 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg">
         <h1 class="text-xl font-bold mb-4">Criar Professor</h1>
 
-        <?php
-        if (!empty($_SESSION['erro'])) {
-            foreach ($_SESSION['erro'] as $msg) {
-                echo "<div class='bg-red-700 p-2 mb-2 rounded'>$msg</div>";
-            }
-            unset($_SESSION['erro']);
-        }
-
-        if (!empty($_SESSION['sucesso'])) {
-            foreach ($_SESSION['sucesso'] as $msg) {
-                echo "<div class='bg-green-700 p-2 mb-2 rounded'>$msg</div>";
-            }
-            unset($_SESSION['sucesso']);
-        }
-        ?>
+        <?php mensagemErro(); ?>
+        <?php mensagemSucesso(); ?>
 
         <form method="POST" class="flex flex-col gap-3">
             <input type="text" name="nome" placeholder="Nome do professor" class="p-2 rounded bg-gray-700">
