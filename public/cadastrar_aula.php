@@ -1,6 +1,7 @@
 <?php
 require_once '../src/controllers/UserControll.php';
 novaAula();
+$turma = $_GET['turma'];
 
 ?>
 <!DOCTYPE html>
@@ -15,10 +16,10 @@ novaAula();
 <body class="bg-[#0B0F1A] text-[#E8EFF7] min-h-screen p-6 flex justify-center">
 
     <div class="w-full max-w-xl p-8 rounded-2xl bg-[#161D2E] border border-[#1F2C42]">
-        <button onclick="history.back()"
+        <a href="turma_aulas.php?turma=<?=$turma?>"
             class="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold">
             ← Voltar
-        </button>
+        </a>
         <h1 class="text-3xl font-bold mb-6">Cadastrar Nova Aula</h1>
         <?php mensagemErro(); ?>
         <?php mensagemSucesso(); ?>

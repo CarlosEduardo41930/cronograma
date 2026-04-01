@@ -45,7 +45,7 @@ document.getElementById('mensagem-erro').onclick = function(){
             </button>
 
             <!-- Home -->
-            <a href="index.php"
+            <a href="login.php"
                 class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-sm font-semibold text-white transition">
                 🏠 Ir para início
             </a>

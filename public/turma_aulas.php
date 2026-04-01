@@ -16,10 +16,10 @@ verificarTipo(['professor']);
   <div class="flex items-center gap-4 mb-6">
 
     <!-- Botão Voltar -->
-    <button onclick="history.back()"
+    <a href="turmas.php"
       class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold transition-colors duration-200">
       ← Voltar
-    </button>
+    </a>
 
     <!-- Botão Sair -->
     <a href="../src/controllers/logout.php"

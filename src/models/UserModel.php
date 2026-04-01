@@ -1,6 +1,7 @@
 <?php
 
-function getLogin($pdo, $nome, $senha) {
+function getLogin($pdo, $nome, $senha)
+{
     // Busca o usuário pelo nome
     $sql = "SELECT * FROM usuario WHERE nome = ?";
     $stmt = $pdo->prepare($sql);
@@ -27,7 +28,6 @@ function getLogin($pdo, $nome, $senha) {
             $_SESSION['id_nivel'] = $nivel['id'];
         } else {
             $_SESSION['erro'][] = "Erro: tipo de usuário não encontrado.";
-
         }
 
         // Redireciona dependendo do nível
@@ -38,12 +38,9 @@ function getLogin($pdo, $nome, $senha) {
             header("Location: ../public/aluno.php");
             exit();
         }
-
     } else {
         $_SESSION['erro'][] = "Usuário ou senha incorretos!";
-
     }
-
 }
 
 function getAulaAluno($pdo, $id,)
@@ -70,20 +67,66 @@ function getAulaProfessor($pdo, $id)
     return $stmt->fetchAll();
 }
 
-function setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao){
+function setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao)
+{
+    if (!$id || !is_numeric($id)) {
+        $_SESSION['erro'][] = "ID do professor inválido.";
+        exit;
+    }
+    if (!$turma || !is_numeric($turma)) {
+        $_SESSION['erro'][] = "ID da turma inválido.";
+        exit;
+    }
+
     $sql = "INSERT INTO aulas (titulo, descricao, data, tipo, ordem, status, exercicio, slide, correcao, fk_turma_id, fk_professor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$titulo,$descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $turma, $id]);
+    $sucesso = $stmt->execute([$titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $turma, $id]);
+    if (!$sucesso) {
+        $_SESSION['erro'][] = "Erro ao criar a aula.";
+        return false;
+    }
+
+    $_SESSION['sucesso'][] = "Aula criada com sucesso!";
+    return true;
 }
-function getAula($pdo, $id){
+
+function getAula($pdo, $id)
+{
     $sql = "SELECT * FROM aulas WHERE status = 'ativa' AND id = ?  ORDER BY CAST(ordem AS UNSIGNED)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
     return $stmt->fetchAll();
 }
 
-function upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao){
-    $sql = "UPDATE aulas SET titulo = ?, descricao = ?, data = ?, tipo = ?, ordem = ?, status = ?, exercicio = ?, slide = ?, correcao = ? WHERE  id = ?";
+function upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $usuario)
+{
+    if (!$id || !is_numeric($id)) {
+        $_SESSION['erro'][] = "ID inválido.";
+        exit;
+    }
+
+    $sql = "UPDATE aulas SET titulo = ?, descricao = ?, data = ?, tipo = ?, ordem = ?, status = ?, exercicio = ?, slide = ?, correcao = ? WHERE  id = ? and fk_professor_id = ?";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $id]);
+    $stmt->execute([$titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $id, $usuario]);
+    if ($stmt->rowCount() === 0) {
+        $_SESSION['erro'][] = "Acesso negado ou aula não encontrada.";
+        exit;
+    }
+}
+function deleteAula($pdo, $aula, $usuario)
+{
+    if (!$aula || !is_numeric($aula)) {
+        $_SESSION['erro'][] = "ID inválido.";
+        return false;
+    }
+
+    $sql = "DELETE FROM aulas WHERE id = ? and fk_professor_id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$aula, $usuario]);
+
+    if ($stmt->rowCount() === 0) {
+        $_SESSION['erro'][] = "Acesso negado ou aula não encontrada.";
+        return false;
+    }
+    return true;
 }

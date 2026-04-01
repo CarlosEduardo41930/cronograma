@@ -1,3 +1,9 @@
+<?php
+require_once '../src/controllers/UserControll.php';
+deletarAula();
+$turma = $_GET['turma'];
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -12,10 +18,13 @@
     <div class="w-full max-w-md p-8 rounded-2xl bg-[#161D2E] border border-[#1F2C42] shadow-lg">
 
         <!-- Voltar -->
-        <button onclick="history.back()"
+        <a href="turma_aulas.php?turma=<?=$turma?>"
             class="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold transition">
             ← Voltar
-        </button>
+        </a>
+        <?php mensagemSucesso() ?>
+        <?php mensagemErro(); ?>
+
 
         <!-- Ícone -->
         <div class="flex justify-center mb-4 text-red-400 text-4xl">
@@ -33,10 +42,11 @@
             <span class="text-red-400 font-semibold">Essa ação não pode ser desfeita.</span>
         </p>
 
-
-
-        <!-- Botões -->
+        <!-- FORMULÁRIO -->
         <form method="POST" class="flex gap-3">
+
+            <!-- ID oculto -->
+            <input type="hidden" name="id" value="<?= $id ?>">
 
             <!-- Cancelar -->
             <button type="button" onclick="history.back()"
@@ -45,7 +55,7 @@
             </button>
 
             <!-- Confirmar -->
-            <button type="submit"
+            <button name="acao" value="delete" type="submit"
                 class="w-full py-3 rounded-lg bg-red-500 hover:bg-red-600 text-sm font-semibold text-white transition">
                 🗑️ Excluir
             </button>

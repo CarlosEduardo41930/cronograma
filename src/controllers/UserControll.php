@@ -188,7 +188,7 @@ function aulaProfessor()
         }
         echo "<h2 class='text-xl font-semibold mb-1'> Aula: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
         echo "<p class='text-sm text-slate-400 mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<p class='text-xs text-slate-500 mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Tipo: </p>";
+        echo "<p class='text-xs text-slate-500 mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Ordem: " . htmlspecialchars($carde['ordem'], ENT_QUOTES, 'UTF-8') ." </p>";
         echo "<div class='flex gap-2 mb-2'>";
         echo "<span class='px-2 py-0.5 rounded text-xs' style='background-color: rgb(209,125,43);'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
         echo "</div>";
@@ -212,7 +212,7 @@ function aulaProfessor()
                 ✏️ Editar
               </a>";
 
-        echo "<a href='excluir_aula.php?aula=$idAula&turma=$id' 
+        echo "<a href='excluir.php?aula=$idAula&turma=$id' 
                 class='px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold text-white transition'>
                 🗑️ Excluir
               </a>";
@@ -227,7 +227,7 @@ function novaAula(){
      global $pdo;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $id = $_SESSION['id_usuario'];
+        $id = $_SESSION['id_nivel'];
         $turma = $_GET['turma'];
         $titulo = sanitizar($_POST['titulo']?? '', 'nome');
         $descricao = sanitizar($_POST['descricao']?? '','texto');
@@ -326,6 +326,7 @@ function editar(){
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id = $_GET['aula'];
         $turma = $_GET['turma'];
+        $usuario = $_SESSION['id_nivel'];
         $titulo = sanitizar($_POST['titulo']?? '', 'nome');
         $descricao = sanitizar($_POST['descricao']?? '','texto');
         $data = $_POST['data'];
@@ -337,7 +338,7 @@ function editar(){
         $correcao = $_POST['correcao']?? '';
 
         if (empty($_SESSION['erro'])) {
-            upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao);
+            upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $usuario);
             $_SESSION['sucesso'] = "Salvo com sucesso!";
             echo "<script>
             setTimeout(function() {
@@ -348,4 +349,24 @@ function editar(){
         }
     }
 
+}
+
+function deletarAula(){
+    global $pdo;
+    if($_SERVER["REQUEST_METHOD"] === "POST"){
+        $aula = $_GET['aula'];
+        $turma = $_GET['turma'];
+        $usuario = $_SESSION['id_nivel'];
+        $delete = deleteAula($pdo, $aula, $usuario);
+        if($delete){
+            $_SESSION['sucesso'] = "Aula excluido com sucesso!";
+            echo "<script>
+            setTimeout(function() {
+            window.location.href = 'turma_aulas.php?turma=$turma';
+            }, 2000);
+            </script>";
+        }else{
+            $_SESSION['erro'][] = "Aula não encontrada";
+        }
+    }
 }
