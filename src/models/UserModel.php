@@ -7,7 +7,6 @@ function getLogin($pdo, $nome, $senha)
     $stmt->execute([$nome]);
     $usuario = $stmt->fetch();
 
-    // ✅ IF PRINCIPAL
     if ($usuario && password_verify($senha, $usuario['senha'])) {
 
         $_SESSION['nivel'] = $usuario['nivel'];
@@ -71,23 +70,25 @@ function setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ord
 {
     if (!$id || !is_numeric($id)) {
         $_SESSION['erro'][] = "ID do professor inválido.";
-        exit;
+        return false;
     }
     if (!$turma || !is_numeric($turma)) {
         $_SESSION['erro'][] = "ID da turma inválido.";
-        exit;
+        return false;
     }
 
+    try{
     $sql = "INSERT INTO aulas (titulo, descricao, data, tipo, ordem, status, exercicio, slide, correcao, fk_turma_id, fk_professor_id, liberarExe, liberarSli, liberarCorr) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     $sucesso = $stmt->execute([$titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $turma, $id,$liberarExe, $liberarSli, $liberarCorr]);
     if (!$sucesso) {
-        $_SESSION['erro'][] = "Erro ao criar a aula.";
+        throw new Exception("Erro ao criar a aula.");
+    }
+    return true;
+    }catch(Exception $e){
+        $_SESSION['erro'][] = $e->getMessage();
         return false;
     }
-
-    $_SESSION['sucesso'][] = "Aula criada com sucesso!";
-    return true;
 }
 
 function getAula($pdo, $id)
@@ -105,13 +106,17 @@ function upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $s
         exit;
     }
 
+    try{
     $sql = "UPDATE aulas SET titulo = ?, descricao = ?, data = ?, tipo = ?, ordem = ?, status = ?, exercicio = ?, slide = ?, correcao = ?, liberarExe = ?, liberarSli = ?, liberarCorr = ? WHERE  id = ? and fk_professor_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $liberarExe, $liberarSli, $liberarCorr, $id, $usuario]);
     if ($stmt->rowCount() === 0) {
-        $_SESSION['erro'][] = "Acesso negado ou aula não encontrada.";
-        exit;
+        throw new Exception("Acesso negado ou aula não encontrada.");
     }
+    }catch(Exception $e){
+        $_SESSION['erro'][] = $e->getMessage();
+    }
+
 }
 function deleteAula($pdo, $aula, $usuario)
 {
@@ -120,36 +125,90 @@ function deleteAula($pdo, $aula, $usuario)
         return false;
     }
 
+    try{
     $sql = "DELETE FROM aulas WHERE id = ? and fk_professor_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$aula, $usuario]);
 
     if ($stmt->rowCount() === 0) {
-        $_SESSION['erro'][] = "Acesso negado ou aula não encontrada.";
-        return false;
+        throw new Exception("Acesso negado ou aula não encontrada.");
     }
     return true;
+    }catch(Exception $e){
+        $_SESSION['erro'][] = $e->getMessage();
+        return false;
+    }
 }
 
 function setProfessor($pdo, $nome, $hashSenha, $profe, $tipo, $descricao, $nivel){
-    if (!$nivel === 'administrador'){
+    if ($nivel !== 'administrador'){
         $_SESSION['erro'][] = "Nivel não permitido.";
+        return false;
     }
 
+    try{
+        $pdo->beginTransaction();
     $sql = "INSERT INTO usuario (nome, senha, nivel) VALUES (?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     $sucesso = $stmt->execute([$nome, $hashSenha, $profe]);
     if (!$sucesso) {
-        $_SESSION['erro'][] = "Erro ao criar o Professor.";
-        return false;
+       throw new Exception("Erro ao criar o Professor.");
     }
     $idUsuario = $pdo->lastInsertId();
     $sql = "INSERT INTO professor (tipo, descricao, fk_usuario_id) VALUES (?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     $suceso = $stmt->execute([$tipo, $descricao, $idUsuario]);
     if (!$suceso) {
-        $_SESSION['erro'][] = "Erro ao criar o Professor.";
+        throw new Exception("Erro ao criar o Professor.");
+    }
+    $pdo->commit();
+    return true;
+    }catch(Exception $e){
+        $pdo->rollBack();
+         $_SESSION['erro'][] =$e->getMessage();
+         return false;
+    }
+
+}
+function getProfessor($pdo, $nivel){
+    if ($nivel !== 'administrador'){
+        $_SESSION['erro'][] = "Nivel não permitido.";
+    }
+
+    $sql = "SELECT p.id as id, u.nome as nome FROM professor p LEFT JOIN usuario u ON p.fk_usuario_id = u.id ORDER BY nome";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+
+}
+
+function setTurma($pdo, $nome, $hashSenha, $turma, $tipo, $descricao, $nivel, $professor) {
+    if ($nivel !== 'administrador'){
+        $_SESSION['erro'][] = "Nivel não permitido.";
         return false;
     }
+
+     try{
+        $pdo->beginTransaction();
+    $sql = "INSERT INTO usuario (nome, senha, nivel) VALUES (?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $sucesso = $stmt->execute([$nome, $hashSenha, $tipo]);
+    if (!$sucesso) {
+       throw new Exception("Erro ao criar o usuario da Turma.");
+    }
+    $idUsuario = $pdo->lastInsertId();
+    $sql = "INSERT INTO turma (turma, descricao, fk_usuario_id, fk_professor) VALUES (?, ?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $suceso = $stmt->execute([$turma, $descricao, $idUsuario, $professor]);
+    if (!$suceso) {
+        throw new Exception("Erro ao criar a Turma.");
+    }
+    $pdo->commit();
     return true;
+    }catch(Exception $e){
+        $pdo->rollBack();
+         $_SESSION['erro'][] =$e->getMessage();
+         return false;
+    }
+    
 }

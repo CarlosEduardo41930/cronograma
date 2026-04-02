@@ -9,6 +9,7 @@ verificarTipo(['professor']);
   <meta charset="UTF-8" />
   <title>EduPortal — Aulas da Turma</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="https://i.postimg.cc/MpRFphR6/Logo-digital-Edu-Portal-com-simbolos-educativos.png" type="image/x-icon">
 </head>
 
 <body class="bg-[#0B0F1A] text-[#E8EFF7] min-h-screen p-6 flex flex-col">

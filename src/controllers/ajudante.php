@@ -13,7 +13,8 @@ function traduz_data_para_exibir($data)
     return $data_exibir;
 }
 
-function sanitizar(string $dado, string $tipo = 'texto'): string {
+function sanitizar(string $dado, string $tipo = 'texto'): string
+{
     $dado = trim($dado);
     $dado = preg_replace('/[\x00-\x1F\x7F]/u', '', $dado);
     $dado = strip_tags($dado);
@@ -26,16 +27,21 @@ function sanitizar(string $dado, string $tipo = 'texto'): string {
             $dado = preg_replace('/\s+/', ' ', $dado);
             break;
 
+        case 'inteiro':
+            // Mantém apenas dígitos e sinal negativo
+            $dado = preg_replace('/[^0-9\-]/', '', $dado);
+            break;
+
         case 'texto':
             $dado = preg_replace('/\s+/', ' ', $dado);
             break;
     }
-    if($tipo === 'nome'){
+    if ($tipo === 'nome') {
         $tamanho = mb_strlen($dado, 'UTF-8');
-        
-        if($tamanho >= 2 && $tamanho <= 50){
-            }else{
-                $_SESSION['erro'][] =  "Nome: Nome deve ter entre 2 e 50 caracteres.";
+
+        if ($tamanho >= 2 && $tamanho <= 25) {
+        } else {
+            $_SESSION['erro'][] =  "Nome: Nome deve ter entre 2 e 25 caracteres.";
         }
     }
 
@@ -43,7 +49,8 @@ function sanitizar(string $dado, string $tipo = 'texto'): string {
 }
 
 
-function validarSenha(string $senha): void {
+function validarSenha(string $senha): void
+{
     if (strlen($senha) < 6)
         $_SESSION['erro'][] =  "Senha: Mínimo 6 caracteres";
 
@@ -52,10 +59,19 @@ function validarSenha(string $senha): void {
 
     if (!preg_match('/[0-9]/', $senha))
         $_SESSION['erro'][] =  "Senha: Pelo menos um número";
-
 }
-function confirmarSenha(string $senha, string $confirmar_senha){
-    if($senha !== $confirmar_senha){
+function confirmarSenha(string $senha, string $confirmar_senha)
+{
+    if ($senha !== $confirmar_senha) {
         $_SESSION['erro'][] = 'As senhas não coincidem.';
     }
+}
+
+function temNumero(int $numero){
+    if (preg_match('/[0-9]/', $numero)) {
+} else {
+    $_SESSION['erro'][] ="Não há números.";
+
+}
+return $numero;
 }

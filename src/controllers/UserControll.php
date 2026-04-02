@@ -44,6 +44,10 @@ function verificarLogadoTipo()
         case 'aluno':
             header("Location: aluno.php");
             break;
+
+            case 'administrador':
+            header("Location: admin_painel.php");
+            break;
     }
     exit;
 }
@@ -62,7 +66,6 @@ function login()
 
         if (empty($_SESSION['erro'])) {
             getLogin($pdo, $nome, $senha);
-            // getTipo($pdo);
         }
     }
 }
@@ -246,13 +249,15 @@ function novaAula()
         $liberarCorr = $_POST['liberarCorr'] ?? '';
 
         if (empty($_SESSION['erro'])) {
-            setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $liberarExe, $liberarSli, $liberarCorr);
-            $_SESSION['sucesso'] = "Salvo com sucesso!";
+            $dados = setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $liberarExe, $liberarSli, $liberarCorr);
+            if ($dados){
+            $_SESSION['sucesso'] = "Aula criada com sucesso!";
             echo "<script>
             setTimeout(function() {
             window.location.href = 'turma_aulas.php?turma=$turma';
             }, 2000);
             </script>";
+        }
         }
     }
 }
@@ -397,7 +402,8 @@ function criarProfessor()
     global $pdo;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nome = sanitizar($_POST['nome'] ?? '', 'nome');
-        $senha = validarSenha($_POST['senha']);
+        validarSenha($_POST['senha']);
+        confirmarSenha($_POST['senha'],$_POST['confirmarSenha']);
         $tipo = sanitizar($_POST['tipo'] ?? '', 'texto');
         $profe = "professor";
         $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
@@ -417,4 +423,43 @@ function criarProfessor()
             }
         }
     }
+}
+
+function professores(){
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $dados = getProfessor($pdo, $nivel);
+    if (empty($_SESSION['erro'])) {
+        foreach ($dados as $professor){
+            echo "<option value='" . $professor['id'] . "'>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</option>";
+        }
+
+}}
+
+function criarTurma(){
+    global $pdo;
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        $nome = sanitizar($_POST['nome'] ?? '', 'nome');
+        validarSenha($_POST['senha']);
+        confirmarSenha($_POST['senha'],$_POST['confirmarSenha']);
+        $turma = sanitizar($_POST['turma'] ?? '', 'texto');
+        $tipo = "aluno";
+        $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
+        $nivel = $_SESSION['nivel'];
+        $professor = temNumero($_POST['professor']);
+
+        if (empty($_SESSION['erro'])) {
+            $hashSenha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+            $dados = setTurma($pdo, $nome, $hashSenha, $turma, $tipo, $descricao, $nivel, $professor);
+            if ($dados) {
+                $_SESSION['sucesso'] = "Turma cadastrado com sucesso!";
+                echo "<script>
+                setTimeout(function() {
+                window.location.href = 'admin_painel.php';
+                }, 2000);
+                </script>";
+            }
+        }
+        
+}
 }
