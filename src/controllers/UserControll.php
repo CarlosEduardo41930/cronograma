@@ -463,3 +463,29 @@ function criarTurma(){
         
 }
 }
+
+function turmasAdmin(){
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $dados = getTurmaAdmin($pdo, $nivel);
+
+    foreach ($dados as $turma){
+        echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
+                    echo "<span>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+                    echo "<a href='excluir_admin.php?turma =" . $turma['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+                echo "</div>";
+    }
+}
+
+function professorAdmin(){
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $dados = getProfessorAdmin($pdo, $nivel);
+
+    foreach ($dados as $professor){
+        echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
+                    echo "<span>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+                    echo "<a href='excluir_admin.php?professor =" . $professor['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+                echo "</div>";
+    }
+}

@@ -1,5 +1,6 @@
 <?php
 require_once '../src/controllers/UserControll.php';
+verificarTipo(['professor']);
 editar();
 
 ?>
@@ -23,11 +24,12 @@ editar();
         <h1 class="text-3xl font-bold mb-6">Editar Aula</h1>
 
         <form method="POST" class="space-y-4">
+            <?php mensagemSucesso(); ?>
             <?php mensagemErro(); ?>
             <?php mostrarAula(); ?>
 
             <!-- Botão -->
-             <?php mensagemSucesso(); ?>
+             
             <button type="submit" class="w-full py-3 rounded bg-yellow-500 hover:bg-yellow-600 font-semibold text-white">
                 Salvar Alterações
             </button>

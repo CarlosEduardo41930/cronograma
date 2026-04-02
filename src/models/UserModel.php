@@ -212,3 +212,114 @@ function setTurma($pdo, $nome, $hashSenha, $turma, $tipo, $descricao, $nivel, $p
     }
     
 }
+
+function getTurmaAdmin($pdo, $nivel)
+{
+    if ($nivel !== 'administrador'){
+        $_SESSION['erro'][] = "Nivel não permitido.";
+        return;
+    }
+    $sql = "SELECT tur.id as id, user.nome as nome FROM turma tur LEFT JOIN usuario user ON user.id = tur.fk_usuario_id WHERE user.nivel = 'aluno'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+
+function getProfessorAdmin($pdo, $nivel){
+    if ($nivel !== 'administrador'){
+        $_SESSION['erro'][] = "Nivel não permitido.";
+        return;
+    }
+    $sql = "SELECT prof.id as id, user.nome as nome FROM professor prof LEFT JOIN usuario user ON user.id = prof.fk_usuario_id WHERE user.nivel = 'professor'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+
+function deleteProfessor($pdo, $professor)
+{
+    if (!$professor || !is_numeric($professor)) {
+        $_SESSION['erro'][] = "ID inválido.";
+        return false;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // pegar usuario vinculado
+        $stmt = $pdo->prepare("SELECT fk_usuario_id FROM professor WHERE id = ?");
+        $stmt->execute([$professor]);
+        $usuario = $stmt->fetchColumn();
+
+        if (!$usuario) {
+            throw new Exception("Professor não encontrado.");
+        }
+
+        // deletar aulas do professor
+        $pdo->prepare("DELETE FROM aulas WHERE fk_professor_id = ?")
+            ->execute([$professor]);
+
+        // deletar turmas do professor
+        $pdo->prepare("DELETE FROM turma WHERE fk_professor = ?")
+            ->execute([$professor]);
+
+        // deletar professor
+        $pdo->prepare("DELETE FROM professor WHERE id = ?")
+            ->execute([$professor]);
+
+        // deletar usuario
+        $pdo->prepare("DELETE FROM usuario WHERE id = ?")
+            ->execute([$usuario]);
+
+        $pdo->commit();
+        return true;
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['erro'][] = $e->getMessage();
+        return false;
+    }
+}
+
+function deleteTurma($pdo, $turma)
+{
+    if (!$turma || !is_numeric($turma)) {
+        $_SESSION['erro'][] = "ID inválido.";
+        return false;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // pegar usuario vinculado
+        $stmt = $pdo->prepare("SELECT fk_usuario_id FROM turma WHERE id = ?");
+        $stmt->execute([$turma]);
+        $usuario = $stmt->fetchColumn();
+
+        if (!$usuario) {
+            throw new Exception("Turma não encontrada.");
+        }
+
+        // deletar aulas da turma
+        $pdo->prepare("DELETE FROM aulas WHERE fk_turma_id = ?")
+            ->execute([$turma]);
+
+        // deletar turma
+        $pdo->prepare("DELETE FROM turma WHERE id = ?")
+            ->execute([$turma]);
+
+        // deletar usuario
+        $pdo->prepare("DELETE FROM usuario WHERE id = ?")
+            ->execute([$usuario]);
+
+        $pdo->commit();
+        return true;
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['erro'][] = $e->getMessage();
+        return false;
+    }
+}

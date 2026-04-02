@@ -1,7 +1,7 @@
 <?php
 require_once '../src/controllers/UserControll.php';
 deletarAula();
-verificarTipo(['administrador']);
+verificarTipo(['professor']);
 $turma = $_GET['turma'];
 ?>
 

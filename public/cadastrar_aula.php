@@ -1,7 +1,7 @@
 <?php
 require_once '../src/controllers/UserControll.php';
 novaAula();
-verificarTipo(['administrador']);
+verificarTipo(['professor']);
 $turma = $_GET['turma'];
 
 ?>
