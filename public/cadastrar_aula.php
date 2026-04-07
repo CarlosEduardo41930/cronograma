@@ -3,131 +3,164 @@ require_once '../src/controllers/UserControll.php';
 novaAula();
 verificarTipo(['professor']);
 $turma = $_GET['turma'];
-
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>EduPortal — Cadastrar Aula</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-      <link rel="shortcut icon" href="https://i.postimg.cc/MpRFphR6/Logo-digital-Edu-Portal-com-simbolos-educativos.png" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <title>EduPortal — Cadastrar Aula</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="shortcut icon" href="https://i.postimg.cc/MpRFphR6/Logo-digital-Edu-Portal-com-simbolos-educativos.png" type="image/x-icon">
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .bg-glow {
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    .field-input {
+      background: #111827; border: 1px solid #1F2C42; color: #E8EFF7;
+      transition: border-color 0.2s, box-shadow 0.2s; width: 100%; padding: 0.75rem; border-radius: 0.5rem;
+    }
+    .field-input::placeholder { color: #3A4F6A; }
+    .field-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    .btn-shine { position: relative; overflow: hidden; }
+    .btn-shine::after {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transform: skewX(-20deg); transition: left 0.5s ease;
+    }
+    .btn-shine:hover::after { left: 160%; }
+  </style>
 </head>
+<body class="bg-[#0B0F1A] text-[#E8EFF7] min-h-screen">
 
-<body class="bg-[#0B0F1A] text-[#E8EFF7] min-h-screen p-6 flex justify-center">
+  <div class="bg-glow"></div>
+  <div class="fixed top-0 right-0 w-72 h-72 opacity-[0.05] pointer-events-none z-0"
+       style="background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 22px 22px;"></div>
 
-    <div class="w-full max-w-xl p-8 rounded-2xl bg-[#161D2E] border border-[#1F2C42]">
-        <a href="turma_aulas.php?turma=<?=$turma?>"
-            class="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold">
-            ← Voltar
-        </a>
-        <h1 class="text-3xl font-bold mb-6">Cadastrar Nova Aula</h1>
-        <?php mensagemErro(); ?>
-        <?php mensagemSucesso(); ?>
-
-       <form method="POST" class="space-y-4">
-
-            <!-- Título -->
-            <div>
-                <label for="titulo" class="block text-sm mb-1">Título:</label>
-                <input name="titulo" type="text" required class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="Título da aula" />
-            </div>
-
-            <!-- Descrição -->
-            <div>
-                <label for="descricao" class="block text-sm mb-1">Descrição:</label>
-                <textarea name="descricao" required class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" rows="3" placeholder="Descrição da aula"></textarea>
-            </div>
-            <!-- Data -->
-            <div>
-                <label for="data" class="block text-sm mb-1">Data:</label>
-                <input name="data" type="date" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" />
-            </div>
-
-            <!-- Tipo -->
-            <div>
-                <label for="tipo" class="block text-sm mb-1">Tipo:</label>
-                <input name="tipo" type="text" required class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="Exel">
-            </div>
-
-            <!-- Ordem -->
-            <div>
-                <label for="ordem" class="block text-sm mb-1">Ordem:</label>
-                <input name="ordem" type="number" step="0.1" required class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="1.0" />
-            </div>
-
-            <!-- Status -->
-            <div>
-                <label for="status" class="block text-sm mb-1">Status da Aula:</label>
-                <select name="status" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]">
-                    <option value="ativa">Ativa</option>
-                    <option value="inativa">Inativa</option>
-                </select>
-            </div>
-
-            <!-- Exercício -->
-            <div>
-                <label for="exercicio" class="block text-sm mb-1">Exercício (link):</label>
-                <input name="exercicio" type="url" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="https://" />
-            </div>
-
-            <div>
-                <label for="liberarExe" class="block text-sm mb-1">Mostrar Exercício:</label>
-                <select name="liberarExe" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]">
-                    <option value="" >...</option>
-                    <option value="sim" class="text-green-700 bg-green-200">Vai Mostrar</option>
-                    <option value="nao"class="text-red-700 bg-red-200">Não Vai Mostrar</option>
-                </select>
-            </div>
-
-            <!-- Slide -->
-            <div>
-                <label for="slide" class="block text-sm mb-1">Slide (link):</label>
-                <input name="slide" type="url" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="https://" />
-            </div>
-            <div>
-                <label for="liberarSli" class="block text-sm mb-1">Mostrar Slide:</label>
-                <select name="liberarSli" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]">
-                    <option value="" >...</option>
-                    <option value="sim" class="text-green-700 bg-green-200">Vai Mostrar</option>
-                    <option value="nao"class="text-red-700 bg-red-200">Não Vai Mostrar</option>
-                </select>
-            </div>
-
-            <!-- Correção -->
-            <div>
-                <label for="correcao" class="block text-sm mb-1">Correção (link):</label>
-                <input name="correcao" type="url" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]" placeholder="https://" />
-            </div>
-            <div>
-                <label for="liberarCorr" class="block text-sm mb-1">Mostrar Correção:</label>
-                <select name="liberarCorr" class="w-full p-3 rounded bg-[#111827] border border-[#1F2C42]">
-                    <option value="" >...</option>
-                    <option value="sim" class="text-green-700 bg-green-200">Vai Mostrar</option>
-                    <option value="nao"class="text-red-700 bg-red-200">Não Vai Mostrar</option>
-                </select>
-            </div>
-
-
-
-
-
-
-
-
-            <!-- Botão -->
-            <button type="submit" class="w-full py-3 rounded bg-blue-500 hover:bg-blue-600 font-semibold text-white">
-                Cadastrar Aula
-            </button>
-
-
-
-
-        </form>
-
-
+  <!-- NAVBAR -->
+  <nav class="relative z-10 border-b border-[#1F2C42] bg-[#0B0F1A]/80 backdrop-blur-sm sticky top-0">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/25 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="#60A5FA" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <span class="text-lg font-bold" style="font-family:'Syne',sans-serif;">EduPortal</span>
+      </div>
+      <a href="turma_aulas.php?turma=<?=$turma?>" class="flex items-center gap-1.5 text-sm text-[#8DA4BF] hover:text-[#E8EFF7] transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Voltar
+      </a>
     </div>
-</body>
+  </nav>
 
+  <div class="relative z-10 max-w-3xl mx-auto px-6 pt-10 pb-16">
+
+    <div class="mb-8">
+      <p class="text-xs uppercase tracking-widest text-[#8DA4BF] mb-1">Professor</p>
+      <h1 class="text-3xl font-bold text-[#E8EFF7]" style="font-family:'Syne',sans-serif;">Cadastrar Nova Aula</h1>
+    </div>
+
+    <?php mensagemErro(); ?>
+    <?php mensagemSucesso(); ?>
+
+    <div class="bg-[#111827] border border-[#1F2C42] rounded-2xl p-8">
+      <form method="POST" class="space-y-5">
+
+        <!-- Título -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Título</label>
+          <input name="titulo" type="text" required class="field-input" placeholder="Título da aula" />
+        </div>
+
+        <!-- Descrição -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Descrição</label>
+          <textarea name="descricao" required class="field-input" rows="3" placeholder="Descrição da aula"></textarea>
+        </div>
+
+        <!-- Data + Tipo + Ordem em grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Data</label>
+            <input name="data" type="date" class="field-input" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Tipo</label>
+            <input name="tipo" type="text" required class="field-input" placeholder="Ex: Excel" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Ordem</label>
+            <input name="ordem" type="number" step="0.1" required class="field-input" placeholder="1.0" />
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5">Status da Aula</label>
+          <select name="status" class="field-input">
+            <option value="ativa">Ativa</option>
+            <option value="inativa">Inativa</option>
+          </select>
+        </div>
+
+        <!-- Separador -->
+        <div class="border-t border-[#1F2C42] pt-5">
+          <p class="text-xs uppercase tracking-widest text-[#8DA4BF] mb-4">Materiais</p>
+
+          <!-- Exercício -->
+          <div class="bg-[#0B0F1A] border border-[#1F2C42] rounded-xl p-4 mb-3">
+            <label class="block text-sm font-semibold text-green-400 mb-2" style="font-family:'Syne',sans-serif;">📝 Exercício</label>
+            <input name="exercicio" type="url" class="field-input mb-2" placeholder="https://" />
+            <select name="liberarExe" class="field-input">
+              <option value="">Visibilidade...</option>
+              <option value="sim">✅ Mostrar para alunos</option>
+              <option value="nao">🚫 Não mostrar</option>
+            </select>
+          </div>
+
+          <!-- Slide -->
+          <div class="bg-[#0B0F1A] border border-[#1F2C42] rounded-xl p-4 mb-3">
+            <label class="block text-sm font-semibold text-blue-400 mb-2" style="font-family:'Syne',sans-serif;">📊 Slide</label>
+            <input name="slide" type="url" class="field-input mb-2" placeholder="https://" />
+            <select name="liberarSli" class="field-input">
+              <option value="">Visibilidade...</option>
+              <option value="sim">✅ Mostrar para alunos</option>
+              <option value="nao">🚫 Não mostrar</option>
+            </select>
+          </div>
+
+          <!-- Correção -->
+          <div class="bg-[#0B0F1A] border border-[#1F2C42] rounded-xl p-4">
+            <label class="block text-sm font-semibold text-red-400 mb-2" style="font-family:'Syne',sans-serif;">✏️ Correção</label>
+            <input name="correcao" type="url" class="field-input mb-2" placeholder="https://" />
+            <select name="liberarCorr" class="field-input">
+              <option value="">Visibilidade...</option>
+              <option value="sim">✅ Mostrar para alunos</option>
+              <option value="nao">🚫 Não mostrar</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botão -->
+        <button type="submit"
+          class="btn-shine w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-200 hover:-translate-y-px active:scale-95 mt-2"
+          style="font-family:'Syne',sans-serif;">
+          Cadastrar Aula
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+</body>
 </html>
