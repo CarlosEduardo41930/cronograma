@@ -45,7 +45,7 @@ function verificarLogadoTipo()
             header("Location: aluno.php");
             break;
 
-            case 'administrador':
+        case 'administrador':
             header("Location: admin_painel.php");
             break;
     }
@@ -250,14 +250,14 @@ function novaAula()
 
         if (empty($_SESSION['erro'])) {
             $dados = setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $liberarExe, $liberarSli, $liberarCorr);
-            if ($dados){
-            $_SESSION['sucesso'] = "Aula criada com sucesso!";
-            echo "<script>
+            if ($dados) {
+                $_SESSION['sucesso'] = "Aula criada com sucesso!";
+                echo "<script>
             setTimeout(function() {
             window.location.href = 'turma_aulas.php?turma=$turma';
             }, 2000);
             </script>";
-        }
+            }
         }
     }
 }
@@ -403,7 +403,7 @@ function criarProfessor()
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nome = sanitizar($_POST['nome'] ?? '', 'nome');
         validarSenha($_POST['senha']);
-        confirmarSenha($_POST['senha'],$_POST['confirmarSenha']);
+        confirmarSenha($_POST['senha'], $_POST['confirmarSenha']);
         $tipo = sanitizar($_POST['tipo'] ?? '', 'texto');
         $profe = "professor";
         $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
@@ -425,23 +425,25 @@ function criarProfessor()
     }
 }
 
-function professores(){
+function professores()
+{
     global $pdo;
     $nivel = $_SESSION['nivel'];
     $dados = getProfessor($pdo, $nivel);
     if (empty($_SESSION['erro'])) {
-        foreach ($dados as $professor){
+        foreach ($dados as $professor) {
             echo "<option value='" . $professor['id'] . "'>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</option>";
         }
+    }
+}
 
-}}
-
-function criarTurma(){
+function criarTurma()
+{
     global $pdo;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nome = sanitizar($_POST['nome'] ?? '', 'nome');
         validarSenha($_POST['senha']);
-        confirmarSenha($_POST['senha'],$_POST['confirmarSenha']);
+        confirmarSenha($_POST['senha'], $_POST['confirmarSenha']);
         $turma = sanitizar($_POST['turma'] ?? '', 'texto');
         $tipo = "aluno";
         $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
@@ -460,32 +462,67 @@ function criarTurma(){
                 </script>";
             }
         }
-        
-}
+    }
 }
 
-function turmasAdmin(){
+function turmasAdmin()
+{
     global $pdo;
     $nivel = $_SESSION['nivel'];
     $dados = getTurmaAdmin($pdo, $nivel);
 
-    foreach ($dados as $turma){
+    foreach ($dados as $turma) {
         echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
-                    echo "<span>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-                    echo "<a href='excluir_admin.php?turma =" . $turma['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
-                echo "</div>";
+        echo "<span>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "<a href='excluir_admin.php?tipo=turma&turma=" . $turma['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+        echo "</div>";
     }
 }
 
-function professorAdmin(){
+function professorAdmin()
+{
     global $pdo;
     $nivel = $_SESSION['nivel'];
     $dados = getProfessorAdmin($pdo, $nivel);
 
-    foreach ($dados as $professor){
+    foreach ($dados as $professor) {
         echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
-                    echo "<span>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-                    echo "<a href='excluir_admin.php?professor =" . $professor['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
-                echo "</div>";
+        echo "<span>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "<a href='excluir_admin.php?tipo=professor&professor=" . $professor['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+        echo "</div>";
     }
 }
+
+function tipoParaDelete()
+{
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $tipo = $_GET['tipo'];
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+        if ($tipo === 'turma') {
+            $idTipo = $_GET['turma'];
+            $dados = deleteTurma($pdo, $idTipo, $nivel);
+        } elseif ($tipo === 'professor') {
+            $idTipo = $_GET['professor'];
+            $dados = deleteProfessor($pdo, $idTipo, $nivel);
+        } else {
+            $_SESSION['erro'][] = "Tipo de usuário não permitido.";
+        }
+        if ($dados) {
+            $_SESSION['sucesso'] = $tipo . " excluido com sucesso!";
+            echo "<script>
+                setTimeout(function() {
+                window.location.href = 'admin_painel.php';
+                }, 2000);
+                </script>";
+        }
+    }
+}
+
+    function mostrarInformacao(){
+        global $pdo;
+        $id = trim($_GET['turma']);
+        $dados = getNomeTurma($pdo, $id);
+        echo $dados['turma'] . " - " . $dados['descricao'];
+    }

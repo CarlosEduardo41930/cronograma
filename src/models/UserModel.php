@@ -238,40 +238,57 @@ function getProfessorAdmin($pdo, $nivel){
 }
 
 
-function deleteProfessor($pdo, $professor)
+function deleteProfessor($pdo, $professor, $nivel)
 {
     if (!$professor || !is_numeric($professor)) {
         $_SESSION['erro'][] = "ID inválido.";
         return false;
     }
 
+    if ($nivel !== 'administrador') {
+        $_SESSION['erro'][] = "Nível não permitido.";
+        return false;
+    }
+
     try {
         $pdo->beginTransaction();
 
-        // pegar usuario vinculado
+        // 🔹 pegar usuario do professor
         $stmt = $pdo->prepare("SELECT fk_usuario_id FROM professor WHERE id = ?");
         $stmt->execute([$professor]);
-        $usuario = $stmt->fetchColumn();
+        $usuarioProfessor = $stmt->fetchColumn();
 
-        if (!$usuario) {
+        if (!$usuarioProfessor) {
             throw new Exception("Professor não encontrado.");
         }
 
-        // deletar aulas do professor
+        // 🔹 pegar usuarios das turmas desse professor
+        $stmt = $pdo->prepare("SELECT fk_usuario_id FROM turma WHERE fk_professor = ?");
+        $stmt->execute([$professor]);
+        $usuariosTurma = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // 🔹 deletar aulas
         $pdo->prepare("DELETE FROM aulas WHERE fk_professor_id = ?")
             ->execute([$professor]);
 
-        // deletar turmas do professor
+        // 🔹 deletar turmas
         $pdo->prepare("DELETE FROM turma WHERE fk_professor = ?")
             ->execute([$professor]);
 
-        // deletar professor
+        // 🔹 deletar usuarios das turmas
+        if (!empty($usuariosTurma)) {
+            $in = str_repeat('?,', count($usuariosTurma) - 1) . '?';
+            $pdo->prepare("DELETE FROM usuario WHERE id IN ($in)")
+                ->execute($usuariosTurma);
+        }
+
+        // 🔹 deletar professor
         $pdo->prepare("DELETE FROM professor WHERE id = ?")
             ->execute([$professor]);
 
-        // deletar usuario
+        // 🔹 deletar usuario do professor
         $pdo->prepare("DELETE FROM usuario WHERE id = ?")
-            ->execute([$usuario]);
+            ->execute([$usuarioProfessor]);
 
         $pdo->commit();
         return true;
@@ -283,10 +300,14 @@ function deleteProfessor($pdo, $professor)
     }
 }
 
-function deleteTurma($pdo, $turma)
+function deleteTurma($pdo, $turma, $nivel)
 {
     if (!$turma || !is_numeric($turma)) {
         $_SESSION['erro'][] = "ID inválido.";
+        return false;
+    }
+    if ($nivel !== 'administrador'){
+        $_SESSION['erro'][] = "Nivel não permitido.";
         return false;
     }
 
@@ -322,4 +343,11 @@ function deleteTurma($pdo, $turma)
         $_SESSION['erro'][] = $e->getMessage();
         return false;
     }
+}
+
+function getNomeTurma($pdo, $id){
+    $sql = "SELECT turma, descricao FROM turma WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch();
 }

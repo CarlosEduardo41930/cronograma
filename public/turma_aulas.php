@@ -30,7 +30,7 @@ verificarTipo(['professor']);
   </div>
   
 
-  <h1 class="text-3xl font-bold mb-6">Turma A – Matemática</h1>
+  <h1 class="text-3xl font-bold mb-6">Turma: <?php mostrarInformacao(); ?></h1>
 
   <!-- Botão para criar nova aula -->
   <div class="mb-6">

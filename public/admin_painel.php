@@ -51,21 +51,7 @@ verificarTipo(['administrador']);
 
             <div id="listaProfessores" class="space-y-2">
 
-                <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
-                    <span>Professor João</span>
-                    <button onclick="removerItem(this)"
-                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
-                        Excluir
-                    </button>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
-                    <span>Professora Maria</span>
-                    <button onclick="removerItem(this)"
-                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
-                        Excluir
-                    </button>
-                </div>
+                <?php professorAdmin(); ?>
 
             </div>
         </div>
@@ -76,21 +62,7 @@ verificarTipo(['administrador']);
 
             <div id="listaTurmas" class="space-y-2">
 
-                <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
-                    <span>Turma A</span>
-                    <a href="excluir_admin.php"
-                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
-                        Excluir
-                    </a>
-                </div>
-
-                <div class="flex justify-between items-center bg-gray-800 p-2 rounded">
-                    <span>Turma B</span>
-                    <button onclick="removerItem(this)"
-                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
-                        Excluir
-                    </button>
-                </div>
+                <?php turmasAdmin(); ?>
 
             </div>
         </div>
