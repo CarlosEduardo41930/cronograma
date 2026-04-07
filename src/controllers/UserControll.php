@@ -10,15 +10,13 @@ require '../src/models/UserModel.php';
 require '../src/config/conexao.php';
 
 
-
-
 function verificarTipo($niveisPermitidos)
 {
-    if (!isset($_SESSION['id_usuario'])) { // se o id tiver nulo, manda devolta pro login
+    if (!isset($_SESSION['id_usuario'])) {
         header('Location: login.php');
         exit();
     }
-    if (!in_array($_SESSION['nivel'], $niveisPermitidos)) { //verifica se o nivel é permitido, se nao for, vai para acesso_negado
+    if (!in_array($_SESSION['nivel'], $niveisPermitidos)) {
         header('Location: acesso_negado.php');
         exit();
     }
@@ -26,12 +24,9 @@ function verificarTipo($niveisPermitidos)
 
 function verificarLogadoTipo()
 {
-
-
     if (!isset($_SESSION['id_usuario'])) {
         return;
     }
-
 
     $tipo = $_SESSION['nivel'] ?? 'default';
 
@@ -39,20 +34,15 @@ function verificarLogadoTipo()
         case 'professor':
             header("Location: turmas.php");
             break;
-
         case 'aluno':
             header("Location: aluno.php");
             break;
-
         case 'administrador':
             header("Location: admin_painel.php");
             break;
     }
     exit;
 }
-
-
-
 
 function login()
 {
@@ -69,35 +59,31 @@ function login()
 }
 
 
+// ─── MENSAGENS ────────────────────────────────────────────────────────────────
+
 function mensagemErro()
 {
     if (!empty($_SESSION['erro'])) {
         echo "
-        <div class='mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 shadow-sm'>
+        <div class='mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4'>
             <div class='flex items-start gap-3'>
-                
-                <!-- Ícone -->
-                <div class='mt-0.5 text-red-400'>
-                    ⚠️
+                <div class='w-8 h-8 rounded-lg bg-red-500/15 border border-red-500/20 flex items-center justify-center shrink-0 mt-0.5'>
+                    <svg class='w-4 h-4 text-red-400' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' d='M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'/>
+                    </svg>
                 </div>
-
-                <!-- Conteúdo -->
                 <div class='flex-1'>
-                    <h3 class='text-sm font-semibold text-red-400 mb-1'>
-                        Ocorreu um erro
-                    </h3>
-
-                    <ul class='text-sm text-red-300 space-y-1 list-disc list-inside'>
+                    <p class='text-xs uppercase tracking-widest text-red-400 font-semibold mb-1.5'>Ocorreu um erro</p>
+                    <ul class='space-y-1'>
         ";
 
         foreach ($_SESSION['erro'] as $erro) {
-            echo "<li>" . htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') . "</li>";
+            echo "<li class='text-sm text-red-300 flex items-start gap-1.5'><span class='mt-1.5 w-1 h-1 rounded-full bg-red-400 shrink-0 inline-block'></span>" . htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') . "</li>";
         }
 
         echo "
                     </ul>
                 </div>
-
             </div>
         </div>
         ";
@@ -110,13 +96,23 @@ function mensagemSucesso()
 {
     if (!empty($_SESSION['sucesso'])) {
         echo "
-        <div class='mb-4 rounded-2xl border border-green-500/30 bg-green-500/10 p-4 text-green-400 text-sm'>
-            ✅ " . htmlspecialchars($_SESSION['sucesso'], ENT_QUOTES, 'UTF-8') . "
+        <div class='mb-4 rounded-2xl border border-green-500/30 bg-green-500/10 p-4'>
+            <div class='flex items-center gap-3'>
+                <div class='w-8 h-8 rounded-lg bg-green-500/15 border border-green-500/20 flex items-center justify-center shrink-0'>
+                    <svg class='w-4 h-4 text-green-400' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/>
+                    </svg>
+                </div>
+                <p class='text-sm text-green-400 font-medium'>" . htmlspecialchars($_SESSION['sucesso'], ENT_QUOTES, 'UTF-8') . "</p>
+            </div>
         </div>
         ";
         unset($_SESSION['sucesso']);
     }
 }
+
+
+// ─── ALUNO ────────────────────────────────────────────────────────────────────
 
 function aulaAluno()
 {
@@ -124,249 +120,338 @@ function aulaAluno()
     $id = $_SESSION['id_nivel'];
     $dados = getAulaAluno($pdo, $id);
 
-
     foreach ($dados as $carde) {
-        $exercicio = $carde['exercicio'];
-        $slide = $carde['slide'];
-        $correcao = $carde['correcao'];
+        $exercicio = htmlspecialchars($carde['exercicio'], ENT_QUOTES, 'UTF-8');
+        $slide     = htmlspecialchars($carde['slide'],     ENT_QUOTES, 'UTF-8');
+        $correcao  = htmlspecialchars($carde['correcao'],  ENT_QUOTES, 'UTF-8');
 
-        echo "<div class='p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:border-blue-500/35 transition-all duration-200 transform hover:-translate-y-0.5'>";
-        echo "<div class='flex items-center gap-2 mb-2'>";
-        echo "<div class='w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
-        echo "<svg class='w-3.5 h-3.5' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
-        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
-        echo "</svg>";
-        echo "</div>";
-        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Aula de: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "</div>";
-        echo "<p class='text-sm text-[#8DA4BF] mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<p class='text-xs text-[#3A4F6A] mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<div class='flex gap-2 mb-3'>";
-        echo "<span class='px-2 py-0.5 rounded text-xs font-medium bg-[rgb(209,125,43)]/15 text-[rgb(209,125,43)] border border-[rgb(209,125,43)]/30'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "</div>";
-        echo "<div class='flex gap-2'>";
+        echo "
+        <div class='aula-card p-5 rounded-2xl border border-[#1F2C42] bg-[#111827] hover:border-blue-500/30 transition-all duration-200'>
+            <div class='flex items-start justify-between gap-3 mb-3'>
+                <h2 class='text-base font-bold text-[#E8EFF7]' style='font-family:\"Syne\",sans-serif;'>
+                    " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "
+                </h2>
+                <span class='px-2 py-0.5 rounded-md text-xs font-semibold shrink-0' style='background-color:rgba(209,125,43,0.15); color:rgb(209,125,43); border:1px solid rgba(209,125,43,0.3);'>
+                    " . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "
+                </span>
+            </div>
+
+            <p class='text-sm text-[#8DA4BF] mb-3 leading-relaxed'>
+                " . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "
+            </p>
+
+            <p class='text-xs text-[#3A4F6A] mb-4'>
+                📅 " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . "
+            </p>
+
+            <div class='flex flex-wrap gap-2'>
+        ";
+
         if ($carde['liberarExe'] === 'sim' && !empty($carde['exercicio'])) {
-            echo "<a href='$exercicio' target='_blank' class='px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Exercício</a>";
+            echo "<a href='$exercicio' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-green-600/80 hover:bg-green-600 border border-green-500/30 transition-all duration-200'>
+                    📝 Exercício
+                  </a>";
         }
         if ($carde['liberarSli'] === 'sim' && !empty($carde['slide'])) {
-            echo "<a href='$slide' target='_blank' class='px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Slide</a>";
+            echo "<a href='$slide' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600/80 hover:bg-blue-600 border border-blue-500/30 transition-all duration-200'>
+                    📊 Slide
+                  </a>";
         }
         if ($carde['liberarCorr'] === 'sim' && !empty($carde['correcao'])) {
-            echo "<a href='$correcao' target='_blank' class='px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Correção</a>";
+            echo "<a href='$correcao' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-red-600/80 hover:bg-red-600 border border-red-500/30 transition-all duration-200'>
+                    ✏️ Correção
+                  </a>";
         }
-        echo "</div>";
-        echo "</div>";
+
+        echo "
+            </div>
+        </div>
+        ";
     }
 }
 
+
+// ─── PROFESSOR ────────────────────────────────────────────────────────────────
 
 function turmas()
 {
     global $pdo;
 
-    $id = $_SESSION['id_nivel'];
+    $id    = $_SESSION['id_nivel'];
     $dados = getTurma($pdo, $id);
 
     foreach ($dados as $turma) {
         $idTurma = $turma['id'];
-        echo "<a href='turma_aulas.php?turma=$idTurma' class='block p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:bg-[#1F253A] hover:border-blue-500/40 transition-all duration-200 transform hover:-translate-y-1'>";
-        echo "<div class='flex items-center gap-2 mb-2'>";
-        echo "<div class='w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
-        echo "<svg class='w-4 h-4' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
-        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
-        echo "</svg>";
-        echo "</div>";
-        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Turma: " . htmlspecialchars($turma['turma'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "</div>";
-        echo "<p class='text-sm text-[#8DA4BF]'>Descrição: " . htmlspecialchars($turma['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "</a>";
+        echo "
+        <a href='turma_aulas.php?turma=$idTurma'
+           class='turma-card group block p-5 rounded-2xl border border-[#1F2C42] bg-[#111827] hover:border-blue-500/30 transition-all duration-200'>
+            <div class='flex items-center justify-between'>
+                <div>
+                    <p class='text-xs uppercase tracking-widest text-[#8DA4BF] mb-1'>Turma</p>
+                    <h2 class='text-lg font-bold text-[#E8EFF7] group-hover:text-blue-400 transition-colors' style='font-family:\"Syne\",sans-serif;'>
+                        " . htmlspecialchars($turma['turma'], ENT_QUOTES, 'UTF-8') . "
+                    </h2>
+                    <p class='text-sm text-[#8DA4BF] mt-1'>
+                        " . htmlspecialchars($turma['descricao'], ENT_QUOTES, 'UTF-8') . "
+                    </p>
+                </div>
+                <div class='w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 transition-colors'>
+                    <svg class='w-4 h-4 text-blue-400' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' d='M9 5l7 7-7 7'/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        ";
     }
 }
-
 
 function aulaProfessor()
 {
     global $pdo;
 
-    $id = trim($_GET['turma']);
+    $id    = trim($_GET['turma']);
     $dados = getAulaProfessor($pdo, $id);
 
     foreach ($dados as $carde) {
-        $idAula = $carde['id'];
-        $exercicio = $carde['exercicio'];
-        $slide = $carde['slide'];
-        $correcao = $carde['correcao'];
+        $idAula   = $carde['id'];
+        $exercicio = htmlspecialchars($carde['exercicio'], ENT_QUOTES, 'UTF-8');
+        $slide     = htmlspecialchars($carde['slide'],     ENT_QUOTES, 'UTF-8');
+        $correcao  = htmlspecialchars($carde['correcao'],  ENT_QUOTES, 'UTF-8');
 
-        echo "<div class='relative p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:border-blue-500/35 transition-all duration-200 transform hover:-translate-y-0.5'>";
-        if ($carde['status'] === 'ativa') {
-            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600/90 text-white'>Ativa</span>";
-        } else {
-            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600/90 text-white'>Inativa</span>";
-        }
-        echo "<div class='flex items-center gap-2 mb-2'>";
-        echo "<div class='w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
-        echo "<svg class='w-3.5 h-3.5' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
-        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
-        echo "</svg>";
-        echo "</div>";
-        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Aula: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "</div>";
-        echo "<p class='text-sm text-[#8DA4BF] mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<p class='text-xs text-[#3A4F6A] mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Ordem: " . htmlspecialchars($carde['ordem'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<div class='flex gap-2 mb-3'>";
-        echo "<span class='px-2 py-0.5 rounded text-xs font-medium bg-[rgb(209,125,43)]/15 text-[rgb(209,125,43)] border border-[rgb(209,125,43)]/30'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "</div>";
+        $statusClass = $carde['status'] === 'ativa'
+            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+            : "bg-red-500/10 text-red-400 border border-red-500/20";
+        $statusLabel = $carde['status'] === 'ativa' ? 'Ativa' : 'Inativa';
 
-        echo "<div class='flex gap-2 justify-between items-center'>";
-        echo "<div class='flex gap-2'>";
+        echo "
+        <div class='aula-card p-5 rounded-2xl border border-[#1F2C42] bg-[#111827] hover:border-blue-500/30 transition-all duration-200'>
+
+            <!-- Cabeçalho -->
+            <div class='flex items-start justify-between gap-3 mb-3'>
+                <div class='flex-1'>
+                    <h2 class='text-base font-bold text-[#E8EFF7]' style='font-family:\"Syne\",sans-serif;'>
+                        " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "
+                    </h2>
+                    <p class='text-sm text-[#8DA4BF] mt-1 leading-relaxed'>
+                        " . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "
+                    </p>
+                </div>
+                <span class='px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 $statusClass'>
+                    $statusLabel
+                </span>
+            </div>
+
+            <!-- Meta -->
+            <div class='flex items-center gap-3 mb-4'>
+                <span class='text-xs text-[#3A4F6A]'>📅 " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . "</span>
+                <span class='text-[#1F2C42]'>•</span>
+                <span class='text-xs text-[#3A4F6A]'>Ordem: " . htmlspecialchars($carde['ordem'], ENT_QUOTES, 'UTF-8') . "</span>
+                <span class='px-2 py-0.5 rounded-md text-xs font-semibold' style='background-color:rgba(209,125,43,0.15); color:rgb(209,125,43); border:1px solid rgba(209,125,43,0.3);'>
+                    " . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "
+                </span>
+            </div>
+
+            <!-- Rodapé: materiais + ações -->
+            <div class='flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#1F2C42]'>
+
+                <!-- Links de material -->
+                <div class='flex flex-wrap gap-2'>
+        ";
+
         if ($carde['liberarExe'] === 'sim' && !empty($carde['exercicio'])) {
-            echo "<a href='$exercicio' target='_blank' class='px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Exercício</a>";
+            echo "<a href='$exercicio' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-green-600/80 hover:bg-green-600 border border-green-500/30 transition-all duration-200'>
+                    📝 Exercício
+                  </a>";
         }
         if ($carde['liberarSli'] === 'sim' && !empty($carde['slide'])) {
-            echo "<a href='$slide' target='_blank' class='px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Slide</a>";
+            echo "<a href='$slide' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600/80 hover:bg-blue-600 border border-500/30 transition-all duration-200'>
+                    📊 Slide
+                  </a>";
         }
         if ($carde['liberarCorr'] === 'sim' && !empty($carde['correcao'])) {
-            echo "<a href='$correcao' target='_blank' class='px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Correção</a>";
+            echo "<a href='$correcao' target='_blank'
+                    class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-red-600/80 hover:bg-red-600 border border-red-500/30 transition-all duration-200'>
+                    ✏️ Correção
+                  </a>";
         }
-        echo "</div>";
-        echo "<div class='flex gap-2'>";
 
-        echo "<a href='editar_aula.php?aula=$idAula&turma=$id' 
-                class='px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-xs font-semibold text-white transition shadow-sm flex items-center gap-1'>
-                <svg class='w-3 h-3' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
-                <path stroke-linecap='round' stroke-linejoin='round' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'/>
-                </svg>
-                Editar
-              </a>";
+        echo "
+                </div>
 
-        echo "<a href='excluir.php?aula=$idAula&turma=$id' 
-                class='px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold text-white transition shadow-sm flex items-center gap-1'>
-                <svg class='w-3 h-3' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
-                <path stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/>
-                </svg>
-                Excluir
-              </a>";
+                <!-- Editar / Excluir -->
+                <div class='flex gap-2 shrink-0'>
+                    <a href='editar_aula.php?aula=$idAula&turma=$id'
+                       class='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-yellow-500/80 hover:bg-yellow-500 border border-yellow-500/30 transition-all duration-200'>
+                        ✏️ Editar
+                    </a>
+                    <a href='excluir.php?aula=$idAula&turma=$id'
+                       class='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-red-500/80 hover:bg-red-500 border border-red-500/30 transition-all duration-200'>
+                        🗑️ Excluir
+                    </a>
+                </div>
 
-        echo "</div>";
-        echo "</div>";
-        echo "</div>";
+            </div>
+        </div>
+        ";
     }
 }
+
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+
+function turmasAdmin()
+{
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $dados = getTurmaAdmin($pdo, $nivel);
+
+    foreach ($dados as $turma) {
+        echo "
+        <div class='item-card flex justify-between items-center bg-[#0B0F1A] border border-[#1F2C42] hover:border-blue-500/20 p-3 rounded-xl transition-all duration-150'>
+            <div class='flex items-center gap-2.5'>
+                <div class='w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center shrink-0'>
+                    <svg class='w-3.5 h-3.5 text-blue-400' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'/>
+                    </svg>
+                </div>
+                <span class='text-sm text-[#E8EFF7] font-medium'>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>
+            </div>
+            <a href='excluir_admin.php?tipo=turma&turma=" . $turma['id'] . "'
+               class='text-xs font-semibold px-3 py-1.5 rounded-lg text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-all duration-150'>
+                Excluir
+            </a>
+        </div>
+        ";
+    }
+}
+
+function professorAdmin()
+{
+    global $pdo;
+    $nivel = $_SESSION['nivel'];
+    $dados = getProfessorAdmin($pdo, $nivel);
+
+    foreach ($dados as $professor) {
+        echo "
+        <div class='item-card flex justify-between items-center bg-[#0B0F1A] border border-[#1F2C42] hover:border-blue-500/20 p-3 rounded-xl transition-all duration-150'>
+            <div class='flex items-center gap-2.5'>
+                <div class='w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/15 flex items-center justify-center shrink-0'>
+                    <svg class='w-3.5 h-3.5 text-blue-400' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/>
+                    </svg>
+                </div>
+                <span class='text-sm text-[#E8EFF7] font-medium'>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>
+            </div>
+            <a href='excluir_admin.php?tipo=professor&professor=" . $professor['id'] . "'
+               class='text-xs font-semibold px-3 py-1.5 rounded-lg text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-all duration-150'>
+                Excluir
+            </a>
+        </div>
+        ";
+    }
+}
+
+
+// ─── FORMULÁRIO EDITAR AULA ──────────────────────────────────────────────────
+
+function mostrarAula()
+{
+    global $pdo;
+
+    $idAula = $_GET['aula'];
+    $aula   = getAula($pdo, $idAula);
+
+    $fi = "w-full p-3 rounded-xl bg-[#0B0F1A] border border-[#1F2C42] text-[#E8EFF7] text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 placeholder-[#3A4F6A]";
+    $lb = "block text-xs uppercase tracking-widest text-[#8DA4BF] mb-1.5";
+
+    foreach ($aula as $dados) {
+
+        echo "<div><label class='$lb'>Título</label>
+              <input name='titulo' type='text' required value='" . htmlspecialchars($dados['titulo'], ENT_QUOTES, 'UTF-8') . "' class='$fi' placeholder='Título da aula' /></div>";
+
+        echo "<div><label class='$lb'>Descrição</label>
+              <textarea name='descricao' required class='$fi' rows='3' placeholder='Descrição da aula'>" . htmlspecialchars($dados['descricao'], ENT_QUOTES, 'UTF-8') . "</textarea></div>";
+
+        echo "<div class='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+                <div><label class='$lb'>Data</label>
+                <input name='data' type='date' value='" . htmlspecialchars($dados['data'], ENT_QUOTES, 'UTF-8') . "' class='$fi' /></div>
+                <div><label class='$lb'>Tipo</label>
+                <input name='tipo' type='text' required value='" . htmlspecialchars($dados['tipo'], ENT_QUOTES, 'UTF-8') . "' class='$fi' placeholder='Ex: Excel' /></div>
+                <div><label class='$lb'>Ordem</label>
+                <input name='ordem' type='number' step='0.1' required value='" . htmlspecialchars($dados['ordem'], ENT_QUOTES, 'UTF-8') . "' class='$fi' placeholder='1.0' /></div>
+              </div>";
+
+        echo "<div><label class='$lb'>Status</label>
+              <select name='status' class='$fi'>
+                  <option value='ativa'"  . ($dados['status'] == 'ativa'   ? ' selected' : '') . ">Ativa</option>
+                  <option value='inativa'" . ($dados['status'] == 'inativa' ? ' selected' : '') . ">Inativa</option>
+              </select></div>";
+
+        // Materiais
+        foreach ([
+            ['exercicio', 'liberarExe', '📝 Exercício', 'green'],
+            ['slide',     'liberarSli', '📊 Slide',     'blue'],
+            ['correcao',  'liberarCorr','✏️ Correção',  'red'],
+        ] as [$campo, $liberar, $label, $cor]) {
+            $colorMap = [
+                'green' => 'text-green-400',
+                'blue'  => 'text-blue-400',
+                'red'   => 'text-red-400',
+            ];
+            $textColor = $colorMap[$cor];
+
+            echo "
+            <div class='bg-[#0B0F1A] border border-[#1F2C42] rounded-xl p-4'>
+                <p class='text-sm font-semibold $textColor mb-2' style='font-family:\"Syne\",sans-serif;'>$label</p>
+                <input name='$campo' type='url' value='" . htmlspecialchars($dados[$campo], ENT_QUOTES, 'UTF-8') . "' class='$fi mb-2' placeholder='https://' />
+                <select name='$liberar' class='$fi'>
+                    <option value=''>Visibilidade...</option>
+                    <option value='sim'" . ($dados[$liberar] == 'sim' ? ' selected' : '') . ">✅ Mostrar para alunos</option>
+                    <option value='nao'" . ($dados[$liberar] == 'nao' ? ' selected' : '') . ">🚫 Não mostrar</option>
+                </select>
+            </div>
+            ";
+        }
+    }
+}
+
+
+// ─── DEMAIS FUNÇÕES (lógica — sem alteração) ──────────────────────────────────
 
 function novaAula()
 {
     global $pdo;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $id = $_SESSION['id_nivel'];
-        $turma = $_GET['turma'];
-        $titulo = sanitizar($_POST['titulo'] ?? '', 'nome');
-        $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
-        $data = $_POST['data'];
-        $tipo = sanitizar($_POST['tipo'] ?? '', 'texto');
-        $ordem = $_POST['ordem'];
-        $status = $_POST['status'] ?? '';
-        $exercicio = $_POST['exercicio'] ?? '';
-        $slide = $_POST['slide'] ?? '';
-        $correcao = $_POST['correcao'] ?? '';
-        $liberarExe = $_POST['liberarExe'] ?? '';
-        $liberarSli = $_POST['liberarSli'] ?? '';
+        $id          = $_SESSION['id_nivel'];
+        $turma       = $_GET['turma'];
+        $titulo      = sanitizar($_POST['titulo']    ?? '', 'nome');
+        $descricao   = sanitizar($_POST['descricao'] ?? '', 'texto');
+        $data        = $_POST['data'];
+        $tipo        = sanitizar($_POST['tipo']      ?? '', 'texto');
+        $ordem       = $_POST['ordem'];
+        $status      = $_POST['status']      ?? '';
+        $exercicio   = $_POST['exercicio']   ?? '';
+        $slide       = $_POST['slide']       ?? '';
+        $correcao    = $_POST['correcao']    ?? '';
+        $liberarExe  = $_POST['liberarExe']  ?? '';
+        $liberarSli  = $_POST['liberarSli']  ?? '';
         $liberarCorr = $_POST['liberarCorr'] ?? '';
 
         if (empty($_SESSION['erro'])) {
             $dados = setCriarAula($pdo, $id, $turma, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $liberarExe, $liberarSli, $liberarCorr);
             if ($dados) {
                 $_SESSION['sucesso'] = "Aula criada com sucesso!";
-                echo "<script>
-            setTimeout(function() {
-            window.location.href = 'turma_aulas.php?turma=$turma';
-            }, 2000);
-            </script>";
+                echo "<script>setTimeout(function(){ window.location.href='turma_aulas.php?turma=$turma'; }, 2000);</script>";
             }
         }
     }
-}
-function mostrarAula()
-{
-    global $pdo;
-
-    $idAula = $_GET['aula'];
-    $aula = getAula($pdo, $idAula);
-    // $id = $_SESSION['id_usuario'];
-
-    foreach ($aula as $dados) {
-        // <!-- Título -->
-        echo "<div>";
-        echo "<label for='titulo' class='block text-sm mb-1'>Título</label>";
-        echo "<input name='titulo' type='text' required  value=" .  htmlspecialchars($dados['titulo'], ENT_QUOTES, 'UTF-8') . " class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='Título da aula' />";
-        echo "</div>";
-
-        // <!-- Descrição -->
-        echo "<div>";
-        echo "<label for='descricao' class='block text-sm mb-1'>Descrição</label>";
-        echo "<textarea name='descricao' required class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' rows='3' placeholder='Descrição da aula'>" . htmlspecialchars($dados['descricao']) . "</textarea>";
-        echo "</div>";
-
-        // <!-- Data -->
-        echo "<div>";
-        echo "<label for='data' class='block text-sm mb-1'>Data</label>";
-        echo "<input name='data' type='date' value=" . htmlspecialchars($dados['data'], ENT_QUOTES, 'UTF-8') . " class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' />";
-        echo "</div>";
-
-        // <!-- Tipo -->
-        echo "<div>";
-        echo "<label for='tipo' class='block text-sm mb-1'>Tipo</label>";
-        echo "<input name='tipo' type='text' required value=" . htmlspecialchars($dados['tipo'], ENT_QUOTES, 'UTF-8') . " class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='Exel'>";
-        echo "</div>";
-
-        // <!-- Ordem -->
-        echo "<div>";
-        echo "<label for='ordem' class='block text-sm mb-1'>Ordem</label>";
-        echo "<input name='ordem' type='number' step='0.1' required value=" . htmlspecialchars($dados['ordem'], ENT_QUOTES, 'UTF-8') . " class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='1.0' />";
-        echo "</div>";
-
-        // <!-- Status -->
-        echo "<div>";
-        echo "<label for='status' class='block text-sm mb-1'>Status</label>";
-        echo "<select name='status' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]'>";
-        echo "<option value='ativa'" . ($dados['status'] == 'ativa' ? 'selected' : '') . ">Ativa</option>";
-        echo "<option value='inativa' " . ($dados['status'] == 'inativa' ? 'selected' : '') . ">Inativa</option>";
-        echo "</select>";
-        echo "</div>";
-
-        // <!-- Exercício -->
-        echo "<div>";
-        echo "<label for='exercicio' class='block text-sm mb-1'>Exercício (link)</label>";
-        echo "<input name='exercicio' type='url' value='" . htmlspecialchars($dados['exercicio'], ENT_QUOTES, 'UTF-8') . "' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='https://' />";
-        echo "<select name='liberarExe' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]'>";
-        echo "<option value='' >...</option>";
-        echo "<option value='sim'" . ($dados['liberarExe'] == 'sim' ? 'selected' : '') . " class='text-green-700 bg-green-200'>Vai Mostrar</option>";
-        echo "<option value='nao'" . ($dados['liberarExe'] == 'nao' ? 'selected' : '') . "class='text-red-700 bg-red-200'>Não Vai Mostrar</option>";
-        echo " </select>";
-        echo "</div>";
-
-        // <!-- Slide -->
-        echo "<div>";
-        echo "<label for='slide' class='block text-sm mb-1'>Slide (link)</label>";
-        echo "<input name='slide' type='url' value='" . htmlspecialchars($dados['slide'], ENT_QUOTES, 'UTF-8') . "' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='https://' />";
-        echo "<select name='liberarSli' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]'>";
-        echo "<option value='' >...</option>";
-        echo "<option value='sim'" . ($dados['liberarSli'] == 'sim' ? 'selected' : '') . " class='text-green-700 bg-green-200'>Vai Mostrar</option>";
-        echo "<option value='nao'" . ($dados['liberarSli'] == 'nao' ? 'selected' : '') . "class='text-red-700 bg-red-200'>Não Vai Mostrar</option>";
-        echo "</select>";
-        echo "</div>";
-
-        // <!-- Correção -->
-        echo "<div>";
-        echo "<label for='correcao' class='block text-sm mb-1'>Correção (link)</label>";
-        echo "<input name='correcao' type='url' value='" . htmlspecialchars($dados['correcao'], ENT_QUOTES, 'UTF-8') . "' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]' placeholder='https://' />";
-        echo "<select name='liberarCorr' class='w-full p-3 rounded bg-[#111827] border border-[#1F2C42]'>";
-        echo "<option value= '' >...</option>";
-        echo "<option value='sim'" . ($dados['liberarCorr'] == 'sim' ? 'selected' : '') . " class='text-green-700 bg-green-200'>Vai Mostrar</option>";
-        echo "<option value='nao'" . ($dados['liberarCorr'] == 'nao' ? 'selected' : '') . "class='text-red-700 bg-red-200'>Não Vai Mostrar</option>";
-        echo "</select>";
-        echo "</div>";
-    };
 }
 
 function editar()
@@ -374,30 +459,26 @@ function editar()
     global $pdo;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $id = $_GET['aula'];
-        $turma = $_GET['turma'];
-        $usuario = $_SESSION['id_nivel'];
-        $titulo = sanitizar($_POST['titulo'] ?? '', 'nome');
-        $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
-        $data = $_POST['data'];
-        $tipo = sanitizar($_POST['tipo'] ?? '', 'texto');
-        $ordem = $_POST['ordem'];
-        $status = $_POST['status'] ?? '';
-        $exercicio = $_POST['exercicio'] ?? '';
-        $slide = $_POST['slide'] ?? '';
-        $correcao = $_POST['correcao'] ?? '';
-        $liberarExe = $_POST['liberarExe'] ?? '';
-        $liberarSli = $_POST['liberarSli'] ?? '';
+        $id          = $_GET['aula'];
+        $turma       = $_GET['turma'];
+        $usuario     = $_SESSION['id_nivel'];
+        $titulo      = sanitizar($_POST['titulo']    ?? '', 'nome');
+        $descricao   = sanitizar($_POST['descricao'] ?? '', 'texto');
+        $data        = $_POST['data'];
+        $tipo        = sanitizar($_POST['tipo']      ?? '', 'texto');
+        $ordem       = $_POST['ordem'];
+        $status      = $_POST['status']      ?? '';
+        $exercicio   = $_POST['exercicio']   ?? '';
+        $slide       = $_POST['slide']       ?? '';
+        $correcao    = $_POST['correcao']    ?? '';
+        $liberarExe  = $_POST['liberarExe']  ?? '';
+        $liberarSli  = $_POST['liberarSli']  ?? '';
         $liberarCorr = $_POST['liberarCorr'] ?? '';
 
         if (empty($_SESSION['erro'])) {
             upperCriarAula($pdo, $id, $titulo, $descricao, $data, $tipo, $ordem, $status, $exercicio, $slide, $correcao, $usuario, $liberarExe, $liberarSli, $liberarCorr);
             $_SESSION['sucesso'] = "Salvo com sucesso!";
-            echo "<script>
-            setTimeout(function() {
-            window.location.href = 'turma_aulas.php?turma=$turma';
-            }, 2000);
-            </script>";
+            echo "<script>setTimeout(function(){ window.location.href='turma_aulas.php?turma=$turma'; }, 2000);</script>";
         }
     }
 }
@@ -406,45 +487,37 @@ function deletarAula()
 {
     global $pdo;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $aula = $_GET['aula'];
-        $turma = $_GET['turma'];
+        $aula    = $_GET['aula'];
+        $turma   = $_GET['turma'];
         $usuario = $_SESSION['id_nivel'];
-        $delete = deleteAula($pdo, $aula, $usuario);
+        $delete  = deleteAula($pdo, $aula, $usuario);
         if ($delete) {
             $_SESSION['sucesso'] = "Aula excluido com sucesso!";
-            echo "<script>
-            setTimeout(function() {
-            window.location.href = 'turma_aulas.php?turma=$turma';
-            }, 2000);
-            </script>";
+            echo "<script>setTimeout(function(){ window.location.href='turma_aulas.php?turma=$turma'; }, 2000);</script>";
         } else {
             $_SESSION['erro'][] = "Aula não encontrada";
         }
     }
 }
+
 function criarProfessor()
 {
     global $pdo;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $nome = sanitizar($_POST['nome'] ?? '', 'nome');
+        $nome      = sanitizar($_POST['nome']      ?? '', 'nome');
         validarSenha($_POST['senha']);
         confirmarSenha($_POST['senha'], $_POST['confirmarSenha']);
-        $tipo = sanitizar($_POST['tipo'] ?? '', 'texto');
-        $profe = "professor";
+        $tipo      = sanitizar($_POST['tipo']      ?? '', 'texto');
+        $profe     = "professor";
         $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
-        $nivel = $_SESSION['nivel'];
-
+        $nivel     = $_SESSION['nivel'];
 
         if (empty($_SESSION['erro'])) {
             $hashSenha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-            $dados = setProfessor($pdo, $nome, $hashSenha, $profe, $tipo, $descricao, $nivel);
+            $dados     = setProfessor($pdo, $nome, $hashSenha, $profe, $tipo, $descricao, $nivel);
             if ($dados) {
                 $_SESSION['sucesso'] = "Professor cadastrado com sucesso!";
-                echo "<script>
-                setTimeout(function() {
-                window.location.href = 'admin_painel.php';
-                }, 2000);
-                </script>";
+                echo "<script>setTimeout(function(){ window.location.href='admin_painel.php'; }, 2000);</script>";
             }
         }
     }
@@ -466,69 +539,23 @@ function criarTurma()
 {
     global $pdo;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $nome = sanitizar($_POST['nome'] ?? '', 'nome');
+        $nome      = sanitizar($_POST['nome']      ?? '', 'nome');
         validarSenha($_POST['senha']);
         confirmarSenha($_POST['senha'], $_POST['confirmarSenha']);
-        $turma = sanitizar($_POST['turma'] ?? '', 'texto');
-        $tipo = "aluno";
+        $turma     = sanitizar($_POST['turma']     ?? '', 'texto');
+        $tipo      = "aluno";
         $descricao = sanitizar($_POST['descricao'] ?? '', 'texto');
-        $nivel = $_SESSION['nivel'];
+        $nivel     = $_SESSION['nivel'];
         $professor = temNumero($_POST['professor']);
 
         if (empty($_SESSION['erro'])) {
             $hashSenha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-            $dados = setTurma($pdo, $nome, $hashSenha, $turma, $tipo, $descricao, $nivel, $professor);
+            $dados     = setTurma($pdo, $nome, $hashSenha, $turma, $tipo, $descricao, $nivel, $professor);
             if ($dados) {
                 $_SESSION['sucesso'] = "Turma cadastrado com sucesso!";
-                echo "<script>
-                setTimeout(function() {
-                window.location.href = 'admin_painel.php';
-                }, 2000);
-                </script>";
+                echo "<script>setTimeout(function(){ window.location.href='admin_painel.php'; }, 2000);</script>";
             }
         }
-    }
-}
-
-function turmasAdmin()
-{
-    global $pdo;
-    $nivel = $_SESSION['nivel'];
-    $dados = getTurmaAdmin($pdo, $nivel);
-
-    foreach ($dados as $turma) {
-        echo "<div class='item-card flex justify-between items-center bg-[#161D2E] border border-[#1F2C42] p-3 rounded-xl transition-all duration-150'>";
-        echo "<div class='flex items-center gap-2'>";
-        echo "<div class='w-6 h-6 rounded-md bg-green-500/10 border border-green-500/20 flex items-center justify-center'>";
-        echo "<svg class='w-3 h-3' fill='none' stroke='#4ADE80' stroke-width='2' viewBox='0 0 24 24'>";
-        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'/>";
-        echo "</svg>";
-        echo "</div>";
-        echo "<span class='text-sm text-[#E8EFF7]'>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "</div>";
-        echo "<a href='excluir_admin.php?tipo=turma&turma=" . $turma['id'] . "' class='bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Excluir</a>";
-        echo "</div>";
-    }
-}
-
-function professorAdmin()
-{
-    global $pdo;
-    $nivel = $_SESSION['nivel'];
-    $dados = getProfessorAdmin($pdo, $nivel);
-
-    foreach ($dados as $professor) {
-        echo "<div class='item-card flex justify-between items-center bg-[#161D2E] border border-[#1F2C42] p-3 rounded-xl transition-all duration-150'>";
-        echo "<div class='flex items-center gap-2'>";
-        echo "<div class='w-6 h-6 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center'>";
-        echo "<svg class='w-3 h-3' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
-        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/>";
-        echo "</svg>";
-        echo "</div>";
-        echo "<span class='text-sm text-[#E8EFF7]'>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "</div>";
-        echo "<a href='excluir_admin.php?tipo=professor&professor=" . $professor['id'] . "' class='bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Excluir</a>";
-        echo "</div>";
     }
 }
 
@@ -536,32 +563,28 @@ function tipoParaDelete()
 {
     global $pdo;
     $nivel = $_SESSION['nivel'];
-    $tipo = $_GET['tipo'];
+    $tipo  = $_GET['tipo'];
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
         if ($tipo === 'turma') {
             $idTipo = $_GET['turma'];
-            $dados = deleteTurma($pdo, $idTipo, $nivel);
+            $dados  = deleteTurma($pdo, $idTipo, $nivel);
         } elseif ($tipo === 'professor') {
             $idTipo = $_GET['professor'];
-            $dados = deleteProfessor($pdo, $idTipo, $nivel);
+            $dados  = deleteProfessor($pdo, $idTipo, $nivel);
         } else {
             $_SESSION['erro'][] = "Tipo de usuário não permitido.";
         }
         if ($dados) {
             $_SESSION['sucesso'] = $tipo . " excluido com sucesso!";
-            echo "<script>
-                setTimeout(function() {
-                window.location.href = 'admin_painel.php';
-                }, 2000);
-                </script>";
+            echo "<script>setTimeout(function(){ window.location.href='admin_painel.php'; }, 2000);</script>";
         }
     }
 }
 
-    function mostrarInformacao(){
-        global $pdo;
-        $id = trim($_GET['turma']);
-        $dados = getNomeTurma($pdo, $id);
-        echo $dados['turma'] . " - " . $dados['descricao'];
-    }
+function mostrarInformacao()
+{
+    global $pdo;
+    $id    = trim($_GET['turma']);
+    $dados = getNomeTurma($pdo, $id);
+    echo htmlspecialchars($dados['turma'] . " — " . $dados['descricao'], ENT_QUOTES, 'UTF-8');
+}
