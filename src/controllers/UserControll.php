@@ -12,7 +12,6 @@ require '../src/config/conexao.php';
 
 
 
-
 function verificarTipo($niveisPermitidos)
 {
     if (!isset($_SESSION['id_usuario'])) { // se o id tiver nulo, manda devolta pro login
@@ -51,7 +50,6 @@ function verificarLogadoTipo()
     }
     exit;
 }
-
 
 
 
@@ -132,25 +130,32 @@ function aulaAluno()
         $slide = $carde['slide'];
         $correcao = $carde['correcao'];
 
-        echo "<div class='p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E]'> ";
-        echo "<h2 class='text-xl font-semibold mb-1'> Aula de: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "<p class='text-sm text-slate-400 mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p> ";
-        echo "<p class='text-xs text-slate-500 mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Tipo: </p> ";
-        echo "<div class='flex gap-2 mb-2'> ";
-        echo "  <span class='px-2 py-0.5 rounded text-xs' style='background-color: rgb(209,125,43);'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span> ";
-        echo "</div> ";
-        echo "<div class='flex gap-2'> ";
+        echo "<div class='p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:border-blue-500/35 transition-all duration-200 transform hover:-translate-y-0.5'>";
+        echo "<div class='flex items-center gap-2 mb-2'>";
+        echo "<div class='w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
+        echo "<svg class='w-3.5 h-3.5' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
+        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
+        echo "</svg>";
+        echo "</div>";
+        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Aula de: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
+        echo "</div>";
+        echo "<p class='text-sm text-[#8DA4BF] mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<p class='text-xs text-[#3A4F6A] mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<div class='flex gap-2 mb-3'>";
+        echo "<span class='px-2 py-0.5 rounded text-xs font-medium bg-[rgb(209,125,43)]/15 text-[rgb(209,125,43)] border border-[rgb(209,125,43)]/30'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "</div>";
+        echo "<div class='flex gap-2'>";
         if ($carde['liberarExe'] === 'sim' && !empty($carde['exercicio'])) {
-            echo "  <a href='$exercicio' target='_blank' class='px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm'>Exercício</a> ";
+            echo "<a href='$exercicio' target='_blank' class='px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Exercício</a>";
         }
         if ($carde['liberarSli'] === 'sim' && !empty($carde['slide'])) {
-            echo "  <a href='$slide' target='_blank' class='px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm'>Slide</a> ";
+            echo "<a href='$slide' target='_blank' class='px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Slide</a>";
         }
         if ($carde['liberarCorr'] === 'sim' && !empty($carde['correcao'])) {
-            echo "  <a href='$correcao' target='_blank' class='px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm'>Correção</a> ";
+            echo "<a href='$correcao' target='_blank' class='px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Correção</a>";
         }
-        echo "</div> ";
-        echo "</div> ";
+        echo "</div>";
+        echo "</div>";
     }
 }
 
@@ -164,9 +169,16 @@ function turmas()
 
     foreach ($dados as $turma) {
         $idTurma = $turma['id'];
-        echo "<a href='turma_aulas.php?turma=$idTurma' class='block p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:bg-[#1F253A] transition'>";
-        echo "<h2 class='text-xl font-semibold'>Turma: " . htmlspecialchars($turma['turma'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "<p class='text-sm text-slate-400 mt-1'>Descrição: " . htmlspecialchars($turma['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<a href='turma_aulas.php?turma=$idTurma' class='block p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:bg-[#1F253A] hover:border-blue-500/40 transition-all duration-200 transform hover:-translate-y-1'>";
+        echo "<div class='flex items-center gap-2 mb-2'>";
+        echo "<div class='w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
+        echo "<svg class='w-4 h-4' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
+        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
+        echo "</svg>";
+        echo "</div>";
+        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Turma: " . htmlspecialchars($turma['turma'], ENT_QUOTES, 'UTF-8') . "</h2>";
+        echo "</div>";
+        echo "<p class='text-sm text-[#8DA4BF]'>Descrição: " . htmlspecialchars($turma['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
         echo "</a>";
     }
 }
@@ -185,41 +197,54 @@ function aulaProfessor()
         $slide = $carde['slide'];
         $correcao = $carde['correcao'];
 
-        echo "<div class='relative p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E]'>";
+        echo "<div class='relative p-4 rounded-2xl border border-[#1F2C42] bg-[#161D2E] hover:border-blue-500/35 transition-all duration-200 transform hover:-translate-y-0.5'>";
         if ($carde['status'] === 'ativa') {
-            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600'>Ativa</span>";
+            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600/90 text-white'>Ativa</span>";
         } else {
-            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600'>Inativa</span>";
+            echo "<span class='absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-600/90 text-white'>Inativa</span>";
         }
-        echo "<h2 class='text-xl font-semibold mb-1'> Aula: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
-        echo "<p class='text-sm text-slate-400 mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
-        echo "<p class='text-xs text-slate-500 mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Ordem: " . htmlspecialchars($carde['ordem'], ENT_QUOTES, 'UTF-8') . " </p>";
-        echo "<div class='flex gap-2 mb-2'>";
-        echo "<span class='px-2 py-0.5 rounded text-xs' style='background-color: rgb(209,125,43);'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "<div class='flex items-center gap-2 mb-2'>";
+        echo "<div class='w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/25 flex items-center justify-center'>";
+        echo "<svg class='w-3.5 h-3.5' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
+        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/>";
+        echo "</svg>";
+        echo "</div>";
+        echo "<h2 class='text-xl font-bold text-[#E8EFF7]' style=\"font-family:'Syne',sans-serif;\">Aula: " . htmlspecialchars($carde['titulo'], ENT_QUOTES, 'UTF-8') . "</h2>";
+        echo "</div>";
+        echo "<p class='text-sm text-[#8DA4BF] mb-2'>" . htmlspecialchars($carde['descricao'], ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<p class='text-xs text-[#3A4F6A] mb-2'>Data: " . htmlspecialchars(traduz_data_para_exibir($carde['data']), ENT_QUOTES, 'UTF-8') . " | Ordem: " . htmlspecialchars($carde['ordem'], ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<div class='flex gap-2 mb-3'>";
+        echo "<span class='px-2 py-0.5 rounded text-xs font-medium bg-[rgb(209,125,43)]/15 text-[rgb(209,125,43)] border border-[rgb(209,125,43)]/30'>" . htmlspecialchars($carde['tipo'], ENT_QUOTES, 'UTF-8') . "</span>";
         echo "</div>";
 
-        echo "<div class='flex gap-2 justify-between'>";
+        echo "<div class='flex gap-2 justify-between items-center'>";
         echo "<div class='flex gap-2'>";
         if ($carde['liberarExe'] === 'sim' && !empty($carde['exercicio'])) {
-            echo "<a href='$exercicio' class='px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm'>Exercício</a>";
+            echo "<a href='$exercicio' target='_blank' class='px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Exercício</a>";
         }
         if ($carde['liberarSli'] === 'sim' && !empty($carde['slide'])) {
-            echo "<a href='$slide' class='px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm'>Slide</a>";
+            echo "<a href='$slide' target='_blank' class='px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Slide</a>";
         }
         if ($carde['liberarCorr'] === 'sim' && !empty($carde['correcao'])) {
-            echo "<a href='$correcao' class='px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm'>Correção</a>";
+            echo "<a href='$correcao' target='_blank' class='px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Correção</a>";
         }
         echo "</div>";
-        echo "<div class='flex justify-end gap-2 pt-2 border-t border-[#1F2C42]'>";
+        echo "<div class='flex gap-2'>";
 
         echo "<a href='editar_aula.php?aula=$idAula&turma=$id' 
-                class='px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-xs font-semibold text-white transition'>
-                ✏️ Editar
+                class='px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-xs font-semibold text-white transition shadow-sm flex items-center gap-1'>
+                <svg class='w-3 h-3' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                <path stroke-linecap='round' stroke-linejoin='round' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'/>
+                </svg>
+                Editar
               </a>";
 
         echo "<a href='excluir.php?aula=$idAula&turma=$id' 
-                class='px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold text-white transition'>
-                🗑️ Excluir
+                class='px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold text-white transition shadow-sm flex items-center gap-1'>
+                <svg class='w-3 h-3' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                <path stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/>
+                </svg>
+                Excluir
               </a>";
 
         echo "</div>";
@@ -472,9 +497,16 @@ function turmasAdmin()
     $dados = getTurmaAdmin($pdo, $nivel);
 
     foreach ($dados as $turma) {
-        echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
-        echo "<span>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "<a href='excluir_admin.php?tipo=turma&turma=" . $turma['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+        echo "<div class='item-card flex justify-between items-center bg-[#161D2E] border border-[#1F2C42] p-3 rounded-xl transition-all duration-150'>";
+        echo "<div class='flex items-center gap-2'>";
+        echo "<div class='w-6 h-6 rounded-md bg-green-500/10 border border-green-500/20 flex items-center justify-center'>";
+        echo "<svg class='w-3 h-3' fill='none' stroke='#4ADE80' stroke-width='2' viewBox='0 0 24 24'>";
+        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'/>";
+        echo "</svg>";
+        echo "</div>";
+        echo "<span class='text-sm text-[#E8EFF7]'>" . htmlspecialchars($turma['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "</div>";
+        echo "<a href='excluir_admin.php?tipo=turma&turma=" . $turma['id'] . "' class='bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Excluir</a>";
         echo "</div>";
     }
 }
@@ -486,9 +518,16 @@ function professorAdmin()
     $dados = getProfessorAdmin($pdo, $nivel);
 
     foreach ($dados as $professor) {
-        echo "<div class='flex justify-between items-center bg-gray-800 p-2 rounded'>";
-        echo "<span>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
-        echo "<a href='excluir_admin.php?tipo=professor&professor=" . $professor['id'] . " ' class='bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm'> Excluir </a>";
+        echo "<div class='item-card flex justify-between items-center bg-[#161D2E] border border-[#1F2C42] p-3 rounded-xl transition-all duration-150'>";
+        echo "<div class='flex items-center gap-2'>";
+        echo "<div class='w-6 h-6 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center'>";
+        echo "<svg class='w-3 h-3' fill='none' stroke='#60A5FA' stroke-width='2' viewBox='0 0 24 24'>";
+        echo "<path stroke-linecap='round' stroke-linejoin='round' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/>";
+        echo "</svg>";
+        echo "</div>";
+        echo "<span class='text-sm text-[#E8EFF7]'>" . htmlspecialchars($professor['nome'], ENT_QUOTES, 'UTF-8') . "</span>";
+        echo "</div>";
+        echo "<a href='excluir_admin.php?tipo=professor&professor=" . $professor['id'] . "' class='bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition shadow-sm'>Excluir</a>";
         echo "</div>";
     }
 }
