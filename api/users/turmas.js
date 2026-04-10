@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'sql208.infinityfree.com',
@@ -27,15 +28,18 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Token inválido' });
   }
 
-  if (user.nivel !== 'professor') {
+  if (user.nivel !== 'administrador') {
     return res.status(403).json({ error: 'Acesso negado' });
   }
 
   if (req.method === 'GET') {
-    const [turmas] = await pool.execute(
-      'SELECT id, turma, descricao FROM turma WHERE fk_professor = ?',
-      [user.id_nivel]
-    );
+    const [turmas] = await pool.execute(`
+      SELECT t.id, t.turma, t.descricao, u.nome, u.nivel, p.id as professor_id, p.tipo as professor_tipo
+      FROM turma t 
+      LEFT JOIN usuario u ON t.fk_usuario_id = u.id 
+      LEFT JOIN professor p ON t.fk_professor = p.id
+      ORDER BY u.nome
+    `);
     return res.json(turmas);
   }
   

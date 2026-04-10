@@ -12,6 +12,10 @@ const pool = mysql.createPool({
 });
 
 export default async function handler(req, res) {
+  if (req.method !== 'DELETE') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
   
@@ -31,13 +35,28 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Acesso negado' });
   }
 
-  if (req.method === 'GET') {
-    const [turmas] = await pool.execute(
-      'SELECT id, turma, descricao FROM turma WHERE fk_professor = ?',
-      [user.id_nivel]
-    );
-    return res.json(turmas);
+  // Extrair ID da aula da URL
+  const match = req.url.match(/\/excluir-aula\/(\d+)/);
+  if (!match) {
+    return res.status(400).json({ error: 'ID da aula não fornecido' });
   }
-  
-  res.status(405).json({ error: 'Method not allowed' });
+  const aulaId = match[1];
+
+  try {
+    const [aulas] = await pool.execute(
+      'SELECT * FROM aulas WHERE id = ? AND fk_professor_id = ?',
+      [aulaId, user.id_nivel]
+    );
+
+    if (aulas.length === 0) {
+      return res.status(404).json({ error: 'Aula não encontrada ou acesso negado' });
+    }
+
+    await pool.execute('DELETE FROM aulas WHERE id = ? AND fk_professor_id = ?', [aulaId, user.id_nivel]);
+
+    res.json({ success: true, message: 'Aula excluída com sucesso' });
+  } catch (error) {
+    console.error('Erro ao excluir aula:', error);
+    res.status(500).json({ error: 'Erro ao excluir aula' });
+  }
 }

@@ -27,16 +27,21 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Token inválido' });
   }
 
-  if (user.nivel !== 'professor') {
-    return res.status(403).json({ error: 'Acesso negado' });
-  }
-
+  // GET /api/aula/[id]
   if (req.method === 'GET') {
-    const [turmas] = await pool.execute(
-      'SELECT id, turma, descricao FROM turma WHERE fk_professor = ?',
-      [user.id_nivel]
+    const match = req.url.match(/\/aula\/(\d+)/);
+    if (!match) {
+      return res.status(400).json({ error: 'ID da aula não fornecido' });
+    }
+    const aulaId = match[1];
+    const [aulas] = await pool.execute(
+      'SELECT * FROM aulas WHERE id = ?',
+      [aulaId]
     );
-    return res.json(turmas);
+    if (aulas.length === 0) {
+      return res.status(404).json({ error: 'Aula não encontrada' });
+    }
+    return res.json(aulas[0]);
   }
   
   res.status(405).json({ error: 'Method not allowed' });

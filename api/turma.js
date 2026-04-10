@@ -31,12 +31,22 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Acesso negado' });
   }
 
+  // Extrair ID da turma da URL
+  const match = req.url.match(/\/turmas\/(\d+)/);
+  if (!match) {
+    return res.status(400).json({ error: 'ID da turma não fornecido' });
+  }
+  const turmaId = match[1];
+
   if (req.method === 'GET') {
     const [turmas] = await pool.execute(
-      'SELECT id, turma, descricao FROM turma WHERE fk_professor = ?',
-      [user.id_nivel]
+      'SELECT id, turma, descricao FROM turma WHERE id = ? AND fk_professor = ?',
+      [turmaId, user.id_nivel]
     );
-    return res.json(turmas);
+    if (turmas.length === 0) {
+      return res.status(404).json({ error: 'Turma não encontrada' });
+    }
+    return res.json(turmas[0]);
   }
   
   res.status(405).json({ error: 'Method not allowed' });

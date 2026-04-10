@@ -27,16 +27,18 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Token inválido' });
   }
 
-  if (user.nivel !== 'professor') {
+  if (user.nivel !== 'administrador') {
     return res.status(403).json({ error: 'Acesso negado' });
   }
 
   if (req.method === 'GET') {
-    const [turmas] = await pool.execute(
-      'SELECT id, turma, descricao FROM turma WHERE fk_professor = ?',
-      [user.id_nivel]
-    );
-    return res.json(turmas);
+    const [professores] = await pool.execute(`
+      SELECT p.id, p.tipo, p.descricao, u.nome, u.nivel 
+      FROM professor p 
+      LEFT JOIN usuario u ON p.fk_usuario_id = u.id 
+      ORDER BY u.nome
+    `);
+    return res.json(professores);
   }
   
   res.status(405).json({ error: 'Method not allowed' });
