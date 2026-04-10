@@ -2,5 +2,8 @@
   "git": {
     "deploymentEnabled": true,
     "productionBranch": "react"
-  }
+  },
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm install"
 }
