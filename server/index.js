@@ -15,14 +15,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API primeiro
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/aulas', aulaRoutes);
 app.use('/api/turmas', turmaRoutes);
 app.use('/api/professores', professorRoutes);
 
+// Frontend por último
 app.use(express.static(path.join(__dirname, '../client/build')));
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
